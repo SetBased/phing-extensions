@@ -14,6 +14,11 @@ class minimizeAndHashTask extends Task
   protected $myHaltOnError = true;
 
   /**
+   * @var bool
+   */
+  protected $myPreserveLastModified;
+
+  /**
    * The (relative) path to the YUI compressor.
    *
    * @var string
@@ -196,6 +201,17 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Setter for XML attribute preserveLastModified.
+   *
+   * @param $thePreserveLastModifiedFlag bool
+   */
+  public function setPreserveLastModified( $thePreserveLastModifiedFlag = true )
+  {
+    $this->myPreserveLastModified = (boolean)$thePreserveLastModifiedFlag;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Setter for XML attribute base_dir.
    *
    * @param $theResourceDir string The path to the resource dir.
@@ -361,13 +377,8 @@ class minimizeAndHashTask extends Task
       }
 
       // Copy mtime from original file to compressed.
-      $status = touch( $file_info['full_path_name_with_hash'].'.gz', filemtime( $file_info['full_path_name_with_hash'] ) );
-      if ($status===false)
-      {
-        $this->logError( "Unable to set mtime of file '%s' to mtime of '%s",
-                         $file_info['full_path_name_with_hash'].'.gz',
-                         $file_info['full_path_name_with_hash'] );
-      }
+      if ($this->myPreserveLastModified) $this->copyTimeStamp( $file_info['full_path_name_with_hash'],
+                                                               $file_info['full_path_name_with_hash'].'.gz' );
 
     }
   }
@@ -609,8 +620,29 @@ class minimizeAndHashTask extends Task
       // Rename compressed temp file with hash.
       $this->renameIncludeFile( $file_info );
 
+      if ($this->myPreserveLastModified) $this->copyTimeStamp( $file_info['full_path_name'],
+                                                               $file_info['full_path_name_with_hash'] );
+
       // Remove the original file.
       unlink( $file_info['full_path_name'] );
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   *
+   */
+  private function copyTimeStamp( $theDonor, $theRecipient)
+  {
+    $time = filemtime( $theDonor );
+    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theDonor );
+
+    $status = touch( $theRecipient, $time );
+    if ($status===false)
+    {
+      $this->logError( "Unable to set mtime of file '%s' to mtime of '%s",
+                       $theRecipient,
+                       $theDonor );
     }
   }
 
