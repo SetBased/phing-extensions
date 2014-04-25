@@ -7,18 +7,6 @@ class minimizeAndHashTask extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  protected $myHaltOnError = true;
-
-  /**
-   * @var bool
-   */
-  protected $myPreserveLastModified;
-
-  /**
    * The (relative) path to the YUI compressor.
    *
    * @var string
@@ -31,6 +19,13 @@ class minimizeAndHashTask extends Task
    * @var bool
    */
   private $myGzipFlag = false;
+
+  /**
+   * If set stop build on errors.
+   *
+   * @var bool
+   */
+  private $myHaltOnError = true;
 
   /**
    * The base dir of the include fileset.
@@ -59,6 +54,16 @@ class minimizeAndHashTask extends Task
    * @var string
    */
   private $myIncludes;
+
+  /**
+   * @var bool
+   */
+  private $myPreserveModificationPermissions = true;
+
+  /**
+   * @var bool
+   */
+  private $myPreserveModificationTime = false;
 
   /**
    * The phing project.
@@ -205,9 +210,20 @@ class minimizeAndHashTask extends Task
    *
    * @param $thePreserveLastModifiedFlag bool
    */
-  public function setPreserveLastModified( $thePreserveLastModifiedFlag = true )
+  public function setPreserveLastModified( $thePreserveLastModifiedFlag )
   {
-    $this->myPreserveLastModified = (boolean)$thePreserveLastModifiedFlag;
+    $this->myPreserveModificationTime = (boolean)$thePreserveLastModifiedFlag;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Setter for XML attribute preservePermissions.
+   *
+   * @param $thePreservePermissionsFlag bool
+   */
+  public function setPreservePermissions( $thePreservePermissionsFlag )
+  {
+    $this->myPreserveModificationPermissions = (boolean)$thePreservePermissionsFlag;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -270,6 +286,17 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   */
+  private function getFilePermissions( $theFilename )
+  {
+    $perms = fileperms( $theFilename );
+    if ($perms===false) $this->logError( "Unable to get permissions of file '%s'.", $theFilename );
+
+    return $perms;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Get hash of current file and make full path with hash to file and path name with hash in source files.
    *
    * @param $theIncludeFileInfo array  The file info for which need to get the hash.
@@ -296,12 +323,17 @@ class minimizeAndHashTask extends Task
 
     foreach ($this->myIncludeFileNames as $filename)
     {
-      $path                                 = $this->myIncludeBaseDir.'/'.$filename;
-      $full_path                            = realpath( $path );
+      clearstatcache();
+
+      $path      = $this->myIncludeBaseDir.'/'.$filename;
+      $full_path = realpath( $path );
+      $mode      = $this->getFilePermissions( $full_path );
+
       $this->myIncludeFilesInfo[$full_path] = array('filename_in_fileset'  => $filename,
                                                     'full_path_name'       => $full_path,
                                                     'full_temp_name'       => $full_path.'.tmp',
-                                                    'path_name_in_sources' => $this->getPathInSources( $full_path ));
+                                                    'path_name_in_sources' => $this->getPathInSources( $full_path ),
+                                                    'mode'                 => $mode);
     }
   }
 
@@ -376,10 +408,17 @@ class minimizeAndHashTask extends Task
                          $file_info['full_path_name_with_hash'].'.gz' );
       }
 
-      // Copy mtime from original file to compressed.
-      if ($this->myPreserveLastModified) $this->copyTimeStamp( $file_info['full_path_name_with_hash'],
-                                                               $file_info['full_path_name_with_hash'].'.gz' );
+      // If required preserve mtime.
+      if ($this->myPreserveModificationTime)
+      {
+        $this->setModificationTime( $file_info['full_path_name_with_hash'], $file_info['full_path_name_with_hash'].'.gz' );
+      }
 
+      // If required preserve file permissions.
+      if ($this->myPreserveModificationTime)
+      {
+        $this->setFilePermissions( $file_info['full_path_name_with_hash'].'.gz', $file_info['mode'] );
+      }
     }
   }
 
@@ -620,29 +659,20 @@ class minimizeAndHashTask extends Task
       // Rename compressed temp file with hash.
       $this->renameIncludeFile( $file_info );
 
-      if ($this->myPreserveLastModified) $this->copyTimeStamp( $file_info['full_path_name'],
-                                                               $file_info['full_path_name_with_hash'] );
+      // If required preserve mtime.
+      if ($this->myPreserveModificationTime)
+      {
+        $this->setModificationTime( $file_info['full_path_name'], $file_info['full_path_name_with_hash'] );
+      }
+
+      // If required preserve file eprmissions.
+      if ($this->myPreserveModificationTime)
+      {
+        $this->setFilePermissions( $file_info['full_path_name_with_hash'], $file_info['mode'] );
+      }
 
       // Remove the original file.
       unlink( $file_info['full_path_name'] );
-    }
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   *
-   */
-  private function copyTimeStamp( $theDonor, $theRecipient)
-  {
-    $time = filemtime( $theDonor );
-    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theDonor );
-
-    $status = touch( $theRecipient, $time );
-    if ($status===false)
-    {
-      $this->logError( "Unable to set mtime of file '%s' to mtime of '%s",
-                       $theRecipient,
-                       $theDonor );
     }
   }
 
@@ -719,6 +749,36 @@ class minimizeAndHashTask extends Task
     if (!$status) $this->logError( "Can not rename file: '%s' to '%s'.",
                                    $theIncludeFileInfo['full_temp_name'],
                                    $theIncludeFileInfo['full_path_name_with_hash'] );
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   */
+  private function setFilePermissions( $theFilename, $theMode )
+  {
+    $status = chmod( $theFilename, $theMode );
+    if ($status===false) $this->logError( "Unable to set permissions for file '%s'.", $theFilename );
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Copy the mtime form the source file to the destination file.
+   *
+   * @param $theSourceFilename      string The full file name of source file.
+   * @param $theDestinationFilename string The full file name of destination file.
+   */
+  private function setModificationTime( $theSourceFilename, $theDestinationFilename )
+  {
+    $time = filemtime( $theSourceFilename );
+    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theSourceFilename );
+
+    $status = touch( $theDestinationFilename, $time );
+    if ($status===false)
+    {
+      $this->logError( "Unable to set mtime of file '%s' to mtime of '%s",
+                       $theDestinationFilename,
+                       $theSourceFilename );
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
