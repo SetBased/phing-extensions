@@ -1,0 +1,5 @@
+.idea
+bin/phing
+bin/yuicompressor.jar
+composer.lock
+vendor

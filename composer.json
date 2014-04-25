@@ -1,0 +1,38 @@
+{
+  "name": "setbased/phing",
+  "description": "Phing Extensions",
+  "type": "library",
+  "keyword": ["Phing", "Extensions"],
+  "licence": "MIT",
+  "authors": [
+    {
+      "name": "Paul Water",
+      "email": "p.r.water@setbased.nl",
+      "homepage": "http://www.setbased.nl",
+      "role": "Architect"
+    },
+    {
+      "name": "Valery Zuban",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0",
+    "packagist/yuicompressor-bin": "*",
+    "phing/phing": "2.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "SetBased": "lib/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://packagist.setbased.nl/"
+    }
+  ],
+  "config": {
+    "bin-dir": "bin"
+  }
+}
