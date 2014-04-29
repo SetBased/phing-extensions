@@ -1,9 +1,9 @@
 <?php
-
+//----------------------------------------------------------------------------------------------------------------------
 /**
- * Class compressAndHash
+ * Class minimizeAndHashTask
  */
-class compressAndHash extends Task
+class minimizeAndHashTask extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -501,9 +501,8 @@ class compressAndHash extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Find all already minimized files and they not minimized alternative. Remove alternative files and info about this
-   * files.
-   * Update file info for minimized file with possible alternative file name in source.
+   * Finds all already minimized files and they not minimized alternative. Removes alternative files and info about
+   * those files. Updates file info for minimized file with possible alternative filename in source files.
    */
   private function prepareIncludeFiles()
   {
@@ -538,7 +537,7 @@ class compressAndHash extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Prepare place holders with include file names and new file names with hash.
+   * Prepares place holders with include file names and new file names with hash.
    */
   private function preparePlaceHolders()
   {
