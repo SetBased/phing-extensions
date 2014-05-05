@@ -692,6 +692,19 @@ class minimizeAndHashTask extends Task
       $new_content = strtr( $content, $this->myReplacePairs );
       if ($content!=$new_content)
       {
+        $files   = $this->getIncludeFilesNamesUsedInSource($new_content);
+        $files[] = $source_filename;
+
+        $times = array();
+        foreach($files as $filename)
+        {
+          $time = filemtime( $filename );
+          if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $filename );
+          $times[] = $time;
+        }
+
+        $time = max($times);
+
         $status = file_put_contents( $source_filename, $new_content );
         if ($status===false)
         {
@@ -701,8 +714,37 @@ class minimizeAndHashTask extends Task
         {
           $this->logInfo( "Updated file '%s'.", $source_filename );
         }
+
+        $status = touch( $source_filename, $time );
+        if ($status===false)
+        {
+          $this->logError( "Unable to set mtime of file '%s'.", $source_filename );
+        }
+
       }
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Gat the array with full path name of the files which used in the source file.
+   *
+   * @param $theSourceContent string Content of updated source file.
+   *
+   * @return array
+   */
+  private function getIncludeFilesNamesUsedInSource($theSourceContent)
+  {
+    $files_name = array();
+    foreach($this->myIncludeFilesInfo as $file_info)
+    {
+      if(strpos($theSourceContent, $file_info['path_name_in_sources_with_hash']))
+      {
+        $files_name[] = $file_info['full_path_name_with_hash'];
+      }
+    }
+
+    return $files_name;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
