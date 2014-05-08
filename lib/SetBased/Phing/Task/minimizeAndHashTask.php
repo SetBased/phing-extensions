@@ -315,6 +315,28 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns an array with info about include files found in a source file.
+   *
+   * @param $theSourceFileContent string Content of updated source file.
+   *
+   * @return array
+   */
+  private function getIncludeFilesInSource( $theSourceFileContent )
+  {
+    $include_files = array();
+    foreach ($this->myIncludeFilesInfo as $file_info)
+    {
+      if (strpos( $theSourceFileContent, $file_info['path_name_in_sources_with_hash'] )!==false)
+      {
+        $include_files[] = $file_info;
+      }
+    }
+
+    return $include_files;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Get the info about each file in the fileset.
    */
   private function getInfoIncludeFiles()
@@ -349,6 +371,34 @@ class minimizeAndHashTask extends Task
     {
       $this->mySourceFilesInfo[] = $this->mySourcesBaseDir.'/'.$theFileName;
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns the maximim mtime of a sources file and its include files.
+   *
+   * @param $theSourceFilename string The name of the source file.
+   * @param $theContent        string The content of the source file with renamed include file names.
+   *
+   * @return mixed
+   */
+  private function getMaxModificationTime( $theSourceFilename, $theContent )
+  {
+    $times = array();
+
+    $time = filemtime( $theSourceFilename );
+    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theSourceFilename );
+    $times[] = $time;
+
+    $include_files_info = $this->getIncludeFilesInSource( $theContent );
+    foreach ($include_files_info as $include_file_info)
+    {
+      $time = filemtime( $include_file_info['full_path_name_with_hash'] );
+      if ($time===false) $this->logError( "Unable to get mtime for file '%s'.", $include_file_info );
+      $times[] = $time;
+    }
+
+    return max( $times );
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -678,7 +728,7 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Replace the the sources files the include file names with minimized and hashed file names.
+   * Replaces in the sources files the include file names with minimized and hashed file names.
    */
   private function processingSourceFiles()
   {
@@ -692,59 +742,27 @@ class minimizeAndHashTask extends Task
       $new_content = strtr( $content, $this->myReplacePairs );
       if ($content!=$new_content)
       {
-        $files   = $this->getIncludeFilesNamesUsedInSource($new_content);
-        $files[] = $source_filename;
+        $time = null;
 
-        $times = array();
-        foreach($files as $filename)
+        // If required determine the latest modification time of the source file and its include files.
+        if ($this->myPreserveModificationTime)
         {
-          $time = filemtime( $filename );
-          if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $filename );
-          $times[] = $time;
+          $time = $this->getMaxModificationTime( $source_filename, $new_content );
         }
 
-        $time = max($times);
-
+        // Write sources file with modified include file names.
         $status = file_put_contents( $source_filename, $new_content );
-        if ($status===false)
-        {
-          $this->logError( "Updating file '%s' failed.", $source_filename );
-        }
-        else
-        {
-          $this->logInfo( "Updated file '%s'.", $source_filename );
-        }
+        if ($status===false) $this->logError( "Updating file '%s' failed.", $source_filename );
+        $this->logInfo( "Updated file '%s'.", $source_filename );
 
-        $status = touch( $source_filename, $time );
-        if ($status===false)
+        // If required set the mtime to the latest modification time of the source file and its include files.
+        if ($this->myPreserveModificationTime)
         {
-          $this->logError( "Unable to set mtime of file '%s'.", $source_filename );
+          $status = touch( $source_filename, $time );
+          if ($status===false) $this->logError( "Unable to set mtime for file '%s'.", $source_filename );
         }
-
       }
     }
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Gat the array with full path name of the files which used in the source file.
-   *
-   * @param $theSourceContent string Content of updated source file.
-   *
-   * @return array
-   */
-  private function getIncludeFilesNamesUsedInSource($theSourceContent)
-  {
-    $files_name = array();
-    foreach($this->myIncludeFilesInfo as $file_info)
-    {
-      if(strpos($theSourceContent, $file_info['path_name_in_sources_with_hash']))
-      {
-        $files_name[] = $file_info['full_path_name_with_hash'];
-      }
-    }
-
-    return $files_name;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
