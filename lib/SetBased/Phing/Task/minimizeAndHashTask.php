@@ -259,7 +259,7 @@ class minimizeAndHashTask extends Task
    */
   private function checkMultipleMinimizedFiles( $theFullPathName )
   {
-    $path_parts = ($theFullPathName);
+    $path_parts = pathinfo($theFullPathName);
 
     $postfix = substr( $path_parts['filename'], -4 );
 
