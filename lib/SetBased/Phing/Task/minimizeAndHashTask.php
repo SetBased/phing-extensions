@@ -257,15 +257,6 @@ class minimizeAndHashTask extends Task
    *
    * @throws BuildException Throw build error if the duplicate files exist.
    */
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Check the possible duplicate files.
-   * E.g. /js/jquery/jquery.min.js and /js/jquery/jquery-min.js
-   *
-   * @param $theFullPathName string The full path name of checking the file.
-   *
-   * @throws BuildException Throw build error if the duplicate files exist.
-   */
   private function checkMultipleMinimizedFiles( $theFullPathName )
   {
     $path_parts = pathinfo($theFullPathName);
