@@ -257,6 +257,15 @@ class minimizeAndHashTask extends Task
    *
    * @throws BuildException Throw build error if the duplicate files exist.
    */
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Check the possible duplicate files.
+   * E.g. /js/jquery/jquery.min.js and /js/jquery/jquery-min.js
+   *
+   * @param $theFullPathName string The full path name of checking the file.
+   *
+   * @throws BuildException Throw build error if the duplicate files exist.
+   */
   private function checkMultipleMinimizedFiles( $theFullPathName )
   {
     $path_parts = pathinfo($theFullPathName);
@@ -275,7 +284,7 @@ class minimizeAndHashTask extends Task
 
     if ($postfix=='.min')
     {
-      $filename       = substr( $path_parts['filename'], 0, (strlen( $path_parts['filename'] ) - 4) ).'.min';
+      $filename       = substr( $path_parts['filename'], 0, (strlen( $path_parts['filename'] ) - 4) ).'-min';
       $full_path_name = $path_parts['dirname'].'/'.$filename.'.'.$path_parts['extension'];
 
       if ($this->myIncludeFilesInfo[$full_path_name]) $this->logError( "Found duplicate files '%s' and '%s'.",
