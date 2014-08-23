@@ -646,10 +646,12 @@ class minimizeAndHashTask extends Task
     foreach ($this->myIncludeFilesInfo as $file_info)
     {
       $this->myReplacePairs["'".$file_info['path_name_in_sources']."'"] = "'".$file_info['path_name_in_sources_with_hash']."'";
+      $this->myReplacePairs['"'.$file_info['path_name_in_sources'].'"'] = '"'.$file_info['path_name_in_sources_with_hash'].'"';
 
       if (isset($file_info['path_name_in_sources_alternative']))
       {
         $this->myReplacePairs["'".$file_info['path_name_in_sources_alternative']."'"] = "'".$file_info['path_name_in_sources_with_hash']."'";
+        $this->myReplacePairs['"'.$file_info['path_name_in_sources_alternative'].'"'] = '"'.$file_info['path_name_in_sources_with_hash'].'"';
       }
     }
   }
@@ -740,6 +742,7 @@ class minimizeAndHashTask extends Task
       if ($content===false) $this->logError( "Unable to read file '%s'.", $source_filename );
 
       $new_content = strtr( $content, $this->myReplacePairs );
+
       if ($content!=$new_content)
       {
         $time = null;
