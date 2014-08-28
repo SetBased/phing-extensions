@@ -23,4 +23,13 @@
         <gitcheckout repository="." branchname="temp"/>
         <gitpull repository="." refspec="${BRANCH}" quiet="false"/>
     </target>
+
+    <!-- Merges the current branch with a remote branch in two steps: step 2 -->
+    <target name="git-merge2">
+        <exec command="git rev-parse --abbrev-ref HEAD" outputProperty="CURRENT_BRANCH" checkreturn="true"/>
+        <input message="Your current branch is '${CURRENT_BRANCH}'. Branch: " propertyName="BRANCH"/>
+        <gitcheckout repository="." branchname="${BRANCH}"/>
+        <gitmerge repository="." remote="temp"/>
+        <gitbranch branchname="temp" repository="." delete="true"/>
+    </target>
 </project>
