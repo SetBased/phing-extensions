@@ -53,10 +53,10 @@ class readSemanticVersion extends Task
   public function main()
   {
     // Read current version form file.
-    $this->readVersion();
+    $this->readPreviousVersionNumber();
 
     // Set new version from CLI.
-    $this->setNewVersion();
+    $this->setNewVersionNumber();
 
     // Update version in file.
     $this->updateVersionInFile();
@@ -169,20 +169,35 @@ class readSemanticVersion extends Task
   /**
    * Read previous version number from file with build version number if the filename is set.
    */
-  private function readVersion()
+  private function readPreviousVersionNumber()
   {
     if ($this->myFilename)
     {
-      $content = file_get_contents( $this->myFilename );
-      if ($content===false)
+      if(is_file($this->myFilename))
       {
-        $this->logError( "Not readable file '%s or file does not exist." );
-      }
+        $content = file_get_contents( $this->myFilename );
+        if ($content===false)
+        {
+          $this->logError( "Not readable file '%s'.", $this->myFilename);
+        }
 
-      if ($content)
+        if ($content)
+        {
+          $this->myPreviousVersion = $this->validateSemanticVersion( $content );
+
+          if($this->myPreviousVersion)
+          {
+            $this->logInfo( "Current version is '%s'.", $this->myPreviousVersion['version'] );
+          }
+          else
+          {
+            $this->logInfo( "For current build version not set." );
+          }
+        }
+      }
+      else
       {
-        $this->myPreviousVersion = $this->validateSemanticVersion( $content );
-        $this->logInfo( "Current version is '%s'.", $this->myPreviousVersion['version'] );
+        $this->logError( "File '%s' does not exist.", $this->myFilename);
       }
     }
   }
@@ -191,13 +206,20 @@ class readSemanticVersion extends Task
   /**
    * Read new version number from php://stdim stream i.e CLI.
    */
-  private function setNewVersion()
+  private function setNewVersionNumber()
   {
     echo "Enter new version: ";
 
     $line = fgets( STDIN );
 
     $this->myNewVersion = $this->validateSemanticVersion( $line );
+
+    if (!$this->myNewVersion)
+    {
+      // If new version not valid. Exit. xxx
+      $this->myHaltOnError = true;
+      $this->logError( "Set invalid version number '%s'.", trim( $line, "\n" ) );
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -221,7 +243,21 @@ class readSemanticVersion extends Task
   {
     if ($this->myFilename)
     {
-      $status = file_put_contents( $this->myFilename, $this->myNewVersion['version'] );
+      // trim version if last part is 0
+      if(!($this->myNewVersion['patch']) && !($this->myNewVersion['minor']))
+      {
+        $version = $this->myNewVersion['major'];
+      }
+      elseif(!($this->myNewVersion['patch']))
+      {
+        $version = $this->myNewVersion['major'].'.'.$this->myNewVersion['minor'];
+      }
+      else
+      {
+        $version = $this->myNewVersion['major'].'.'.$this->myNewVersion['minor'].'.'.$this->myNewVersion['patch'];
+      }
+
+      $status = file_put_contents( $this->myFilename, $version );
 
       if (!$status)
       {
@@ -241,19 +277,16 @@ class readSemanticVersion extends Task
    */
   private function validateSemanticVersion( $theVersion )
   {
-    if (count( $this->myPreviousVersion )!=0)
-    {
-      $version = $this->myPreviousVersion;
-    }
-    else
-    {
-      $version = array('version' => '0.0.0',
-                       'major'   => 0,
-                       'minor'   => 0,
-                       'patch'   => 0);
-    }
+    /**
+     * Notice:
+     * Version validation http://semver.org/
+     * Example:
+     * Valid version numbers: 1, 1.2, 2.2.3, 1.2.6-alpha, 4.2.3-alpha.beta, 1.5.0-rc.1;
+     * Invalid version numbers: 1., 1.2., 1beta, 4.5alpha, 1.2.3-rc_1;
+     */
+    $status = preg_match( '/^(\d+)(?:\.(\d+))?(?:\.((\d+)(?:-([A-Za-z]+)(?:\.(\w+))?)?))?$/', $theVersion, $matches );
 
-    $status = preg_match( '/^(\d+)\.(\d+)\.(\d+)$/', $theVersion, $matches );
+    $version = array();
 
     if ($status)
     {
@@ -261,10 +294,9 @@ class readSemanticVersion extends Task
       $version['major']   = $matches[1];
       $version['minor']   = $matches[2];
       $version['patch']   = $matches[3];
-    }
-    else
-    {
-      $this->logError( "Invalid version number '%s'.", trim( $theVersion, "\n" ) );
+      $version['patch_x'] = $matches[4];
+      $version['patch_y'] = $matches[5];
+      $version['patch_z'] = $matches[6];
     }
 
     return $version;
