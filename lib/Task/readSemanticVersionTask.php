@@ -3,44 +3,60 @@
 /**
  * Class readSemanticVersion
  */
-class readSemanticVersion extends Task
+class readSemanticVersionTask extends Task
 {
   /**
+   * The filename with contain semantic version number.
+   *
    * @var string
    */
   private $myFilename;
 
   /**
+   * If set stop build on errors.
+   *
    * @var bool
    */
   private $myHaltOnError;
 
   /**
+   * Name of variable in a build for major part of version number.
+   *
    * @var string
    */
   private $myMajorProperty;
 
   /**
+   * Name of variable in a build for minor part of version number.
+   *
    * @var string
    */
   private $myMinorProperty;
 
   /**
+   * Array with parts of new version number.
+   *
    * @var array
    */
   private $myNewVersion = array();
 
   /**
+   * Name of variable in a build for patch part of version number.
+   *
    * @var string
    */
   private $myPatchProperty;
 
   /**
+   * Array with parts of previous version number.
+   *
    * @var array
    */
   private $myPreviousVersion = array();
 
   /**
+   * Name of variable in a build for full version number.
+   *
    * @var string
    */
   private $myVersionProperty;
@@ -203,21 +219,28 @@ class readSemanticVersion extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Read new version number from php://stdin stream i.e CLI.
+   * Read new version number from php://stdim stream i.e CLI.
    */
   private function setNewVersionNumber()
   {
-    echo "Enter new version: ";
+    $flag = true;
 
-    $line = fgets( STDIN );
-
-    $this->myNewVersion = $this->validateSemanticVersion( $line );
-
-    if (!$this->myNewVersion)
+    while ($flag)
     {
-      // If new version not valid. Exit. xxx
-      $this->myHaltOnError = true;
-      $this->logError( "Set invalid version number '%s'.", trim( $line, "\n" ) );
+      echo "Enter new version: ";
+
+      $line = fgets( STDIN );
+
+      $this->myNewVersion = $this->validateSemanticVersion( $line );
+
+      if (!$this->myNewVersion)
+      {
+        $this->logError( "Set invalid version number '%s'.", trim( $line, "\n" ) );
+      }
+      else
+      {
+        $flag = false;
+      }
     }
   }
 
