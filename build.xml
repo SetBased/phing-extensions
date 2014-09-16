@@ -43,6 +43,7 @@
                              patchProperty="PATH"
                              haltOnError="true"/>
         <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
+        <gitpush repository="."/>
         <gittag repository="." name="${VERSION}"/>
         <gitpush repository="." refspec="origin tag {$VERSION}"/>
     </target>
