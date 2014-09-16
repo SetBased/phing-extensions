@@ -1,5 +1,4 @@
 <?php
-
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Class readSemanticVersion
@@ -124,11 +123,11 @@ class readSemanticVersion extends Task
   /**
    * Setter for XML attribute versionProperty.
    *
-   * @param string $theMajorVersion
+   * @param string $theVersion
    */
-  public function setVersionProperty( $theMajorVersion )
+  public function setVersionProperty( $theVersion )
   {
-    $this->myVersionProperty = $theMajorVersion;
+    $this->myVersionProperty = $theVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -167,44 +166,44 @@ class readSemanticVersion extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Read previous version number from file with build version number if the filename is set.
+   * Reads previous version from file if filename is set.
    */
   private function readPreviousVersionNumber()
   {
     if ($this->myFilename)
     {
-      if(is_file($this->myFilename))
+      if (is_file( $this->myFilename ))
       {
         $content = file_get_contents( $this->myFilename );
         if ($content===false)
         {
-          $this->logError( "Not readable file '%s'.", $this->myFilename);
+          $this->logError( "Not readable file '%s'.", $this->myFilename );
         }
 
         if ($content)
         {
           $this->myPreviousVersion = $this->validateSemanticVersion( $content );
-
-          if($this->myPreviousVersion)
+          if ($this->myPreviousVersion)
           {
             $this->logInfo( "Current version is '%s'.", $this->myPreviousVersion['version'] );
           }
           else
           {
-            $this->logInfo( "For current build version not set." );
+            $this->logError( "Version is '%s' is not a valid Semantic Version.",
+                             $this->myPreviousVersion['version'] );
           }
         }
       }
       else
       {
-        $this->logError( "File '%s' does not exist.", $this->myFilename);
+        $this->logInfo( "File '%s' does not exist.", $this->myFilename );
       }
     }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Read new version number from php://stdim stream i.e CLI.
+   * Read new version number from php://stdin stream i.e CLI.
    */
   private function setNewVersionNumber()
   {
@@ -224,11 +223,10 @@ class readSemanticVersion extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Add new properties to phing project with data about version number.
+   * Adds new properties to phing project with data about version number.
    */
   private function setProjectVersionProperties()
   {
-    // Add new version number.
     $this->project->setNewProperty( $this->myVersionProperty, $this->myNewVersion['version'] );
     $this->project->setNewProperty( $this->myMajorProperty, $this->myNewVersion['major'] );
     $this->project->setNewProperty( $this->myMinorProperty, $this->myNewVersion['minor'] );
@@ -237,18 +235,18 @@ class readSemanticVersion extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Write new version number into file if the filename is set.
+   * Writes new version number into file if the filename is set.
    */
   private function updateVersionInFile()
   {
     if ($this->myFilename)
     {
       // trim version if last part is 0
-      if(!($this->myNewVersion['patch']) && !($this->myNewVersion['minor']))
+      if (!($this->myNewVersion['patch']) && !($this->myNewVersion['minor']))
       {
         $version = $this->myNewVersion['major'];
       }
-      elseif(!($this->myNewVersion['patch']))
+      elseif (!($this->myNewVersion['patch']))
       {
         $version = $this->myNewVersion['major'].'.'.$this->myNewVersion['minor'];
       }
@@ -258,7 +256,6 @@ class readSemanticVersion extends Task
       }
 
       $status = file_put_contents( $this->myFilename, $version );
-
       if (!$status)
       {
         $this->logError( "File '%s' is not writable.", $this->myFilename );
