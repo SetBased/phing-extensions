@@ -44,6 +44,6 @@
                              haltOnError="true"/>
         <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
         <gittag repository="." name="${VERSION}"/>
-        <gitpush repository="." destination="origin" refspec="tag {$VERSION}"/>
+        <gitpush repository="." refspec="origin tag {$VERSION}"/>
     </target>
 </project>
