@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Phing Extensions" default="build"  basedir=".">
+    <taskdef name="readSemanticVersion" classname="lib.Task.readSemanticVersion"/>
+
     <target name="build"/>
 
     <!-- Merges the current branch with a remote branch -->
@@ -31,5 +33,17 @@
         <gitcheckout repository="." branchname="${BRANCH}"/>
         <gitmerge repository="." remote="temp"/>
         <gitbranch branchname="temp" repository="." delete="true"/>
+    </target>
+
+    <target name="version">
+        <readSemanticVersion file=".version"
+                             versionProperty="VERSION"
+                             majorProperty="MAJOR"
+                             minorProperty="MINOR"
+                             patchProperty="PATH"
+                             haltOnError="true"/>
+        <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
+        <gittag repository="." name="${VERSION}"/>
+        <gitpush repository="." destination="origin" tags="${VERSION}"/>
     </target>
 </project>
