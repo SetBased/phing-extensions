@@ -219,22 +219,27 @@ class readSemanticVersionTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Read new version number from php://stdin stream i.e CLI.
+   * Read new version number from php://stdim stream i.e CLI.
    */
   private function setNewVersionNumber()
   {
-    $valid = false;
-    while (!$valid)
+    $flag = true;
+
+    while ($flag)
     {
-      echo "Enter new Semantic Version: ";
+      echo "Enter new version: ";
 
       $line = fgets( STDIN );
-      $this->myNewVersion = $this->validateSemanticVersion( $line );
-      $valid = ($this->myNewVersion);
 
-      if (!$valid)
+      $this->myNewVersion = $this->validateSemanticVersion( $line );
+
+      if (!$this->myNewVersion)
       {
-        $this->logInfo( "'%s' is not a valid Semantic Version.", trim( $line, "\n" ) );
+        $this->logError( "Set invalid version number '%s'.", trim( $line, "\n" ) );
+      }
+      else
+      {
+        $flag = false;
       }
     }
   }
@@ -245,10 +250,10 @@ class readSemanticVersionTask extends Task
    */
   private function setProjectVersionProperties()
   {
-    $this->project->setUserProperty( $this->myVersionProperty, $this->myNewVersion['version'] );
-    $this->project->setUserProperty( $this->myMajorProperty, $this->myNewVersion['major'] );
-    $this->project->setUserProperty( $this->myMinorProperty, $this->myNewVersion['minor'] );
-    $this->project->setUserProperty( $this->myPatchProperty, $this->myNewVersion['patch'] );
+    $this->project->setNewProperty( $this->myVersionProperty, $this->myNewVersion['version'] );
+    $this->project->setNewProperty( $this->myMajorProperty, $this->myNewVersion['major'] );
+    $this->project->setNewProperty( $this->myMinorProperty, $this->myNewVersion['minor'] );
+    $this->project->setNewProperty( $this->myPatchProperty, $this->myNewVersion['patch'] );
   }
 
   //--------------------------------------------------------------------------------------------------------------------

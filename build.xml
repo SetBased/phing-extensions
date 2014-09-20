@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Phing Extensions" default="build"  basedir=".">
-    <taskdef name="readSemanticVersion" classname="lib.Task.readSemanticVersionTask"/>
-    <property name="VERSION" value="0.0.0"/> <!-- Keep our IDE happy -->
+    <taskdef name="readSemanticVersion" classname="lib.Task.readSemanticVersion"/>
 
     <target name="build"/>
 
@@ -39,8 +38,10 @@
     <target name="version">
         <readSemanticVersion file=".version"
                              versionProperty="VERSION"
+                             majorProperty="MAJOR"
+                             minorProperty="MINOR"
+                             patchProperty="PATH"
                              haltOnError="true"/>
-        <echo message="${VERSION}"/>
         <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
         <gitpush repository="."/>
         <gittag repository="." name="${VERSION}"/>
