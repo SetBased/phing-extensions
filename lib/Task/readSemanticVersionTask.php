@@ -219,27 +219,22 @@ class readSemanticVersionTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Read new version number from php://stdim stream i.e CLI.
+   * Read new version number from php://stdin stream i.e CLI.
    */
   private function setNewVersionNumber()
   {
-    $flag = true;
-
-    while ($flag)
+    $valid = false;
+    while (!$valid)
     {
-      echo "Enter new version: ";
+      echo "Enter new Semantic Version: ";
 
       $line = fgets( STDIN );
-
       $this->myNewVersion = $this->validateSemanticVersion( $line );
+      $valid = ($this->myNewVersion);
 
-      if (!$this->myNewVersion)
+      if (!$valid)
       {
-        $this->logError( "Set invalid version number '%s'.", trim( $line, "\n" ) );
-      }
-      else
-      {
-        $flag = false;
+        $this->logInfo( "'%s' is not a valid Semantic Version.", trim( $line, "\n" ) );
       }
     }
   }
@@ -250,10 +245,10 @@ class readSemanticVersionTask extends Task
    */
   private function setProjectVersionProperties()
   {
-    $this->project->setNewProperty( $this->myVersionProperty, $this->myNewVersion['version'] );
-    $this->project->setNewProperty( $this->myMajorProperty, $this->myNewVersion['major'] );
-    $this->project->setNewProperty( $this->myMinorProperty, $this->myNewVersion['minor'] );
-    $this->project->setNewProperty( $this->myPatchProperty, $this->myNewVersion['patch'] );
+    $this->project->setUserProperty( $this->myVersionProperty, $this->myNewVersion['version'] );
+    $this->project->setUserProperty( $this->myMajorProperty, $this->myNewVersion['major'] );
+    $this->project->setUserProperty( $this->myMinorProperty, $this->myNewVersion['minor'] );
+    $this->project->setUserProperty( $this->myPatchProperty, $this->myNewVersion['patch'] );
   }
 
   //--------------------------------------------------------------------------------------------------------------------
