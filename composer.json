@@ -1,6 +1,6 @@
 {
   "name": "setbased/phing",
-  "description": "Phing Extensions",
+  "description": "A collection of Phing extensions",
   "type": "library",
   "keyword": ["Phing", "Extensions"],
   "licence": "MIT",
