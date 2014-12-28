@@ -1,6 +1,6 @@
 {
   "name": "setbased/phing",
-  "description": "A collection of Phing extensions",
+  "description": "A collection of Phing extensions.",
   "type": "library",
   "keyword": ["Phing", "Extensions"],
   "licence": "MIT",
@@ -26,12 +26,6 @@
       "SetBased\\Phing\\": "lib/"
     }
   },
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "http://packagist.setbased.nl/"
-    }
-  ],
   "config": {
     "bin-dir": "bin"
   }
