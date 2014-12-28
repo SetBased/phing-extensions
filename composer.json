@@ -3,7 +3,7 @@
   "description": "A collection of Phing extensions.",
   "type": "library",
   "keyword": ["Phing", "Extensions"],
-  "licence": "MIT",
+  "license": "MIT",
   "authors": [
     {
       "name": "Paul Water",
