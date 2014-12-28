@@ -1,11 +1,11 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class readSemanticVersion
+ * Phing task for reading a Semantic Version standard input.
  */
 class readSemanticVersionTask extends Task
 {
-
+  //--------------------------------------------------------------------------------------------------------------------
   /**
    * The filename with contain semantic version number.
    *

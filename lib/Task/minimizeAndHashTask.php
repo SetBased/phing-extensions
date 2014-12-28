@@ -123,7 +123,7 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Initialisation of this task.
+   * Initialises this task.
    */
   public function init()
   {
@@ -259,7 +259,7 @@ class minimizeAndHashTask extends Task
    */
   private function checkMultipleMinimizedFiles( $theFullPathName )
   {
-    $path_parts = pathinfo($theFullPathName);
+    $path_parts = pathinfo( $theFullPathName );
 
     $postfix = substr( $path_parts['filename'], -4 );
 
@@ -286,6 +286,12 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Returns the permissions of a file.
+   *
+   * @param string $theFilename The filename.
+   *
+   * @throws BuildException
+   * @return int
    */
   private function getFilePermissions( $theFilename )
   {
@@ -349,13 +355,12 @@ class minimizeAndHashTask extends Task
 
       $path      = $this->myIncludeBaseDir.'/'.$filename;
       $full_path = realpath( $path );
-      $mode      = $this->getFilePermissions( $full_path );
 
       $this->myIncludeFilesInfo[$full_path] = array('filename_in_fileset'  => $filename,
                                                     'full_path_name'       => $full_path,
                                                     'full_temp_name'       => $full_path.'.tmp',
                                                     'path_name_in_sources' => $this->getPathInSources( $full_path ),
-                                                    'mode'                 => $mode);
+                                                    'mode'                 => $this->getFilePermissions( $full_path ));
     }
   }
 
@@ -375,12 +380,12 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Returns the maximim mtime of a sources file and its include files.
+   * Returns the maximum mtime of a sources file and its include files.
    *
    * @param $theSourceFilename string The name of the source file.
    * @param $theContent        string The content of the source file with renamed include file names.
    *
-   * @return mixed
+   * @return int
    */
   private function getMaxModificationTime( $theSourceFilename, $theContent )
   {
@@ -414,7 +419,7 @@ class minimizeAndHashTask extends Task
   {
     if (strncmp( $thePath, $this->myResourceDirFullPath, strlen( $this->myResourceDirFullPath ) )!=0)
     {
-      throw new BuildException('Internal error.');
+      throw new BuildException( 'Internal error.' );
     }
 
     return substr( $thePath, strlen( $this->myResourceDirFullPath ) );
@@ -510,7 +515,7 @@ class minimizeAndHashTask extends Task
       if (!is_scalar( $arg )) $arg = var_export( $arg, true );
     }
 
-    if ($this->myHaltOnError) throw new BuildException(vsprintf( $format, $args ));
+    if ($this->myHaltOnError) throw new BuildException( vsprintf( $format, $args ) );
     else $this->log( vsprintf( $format, $args ), Project::MSG_ERR );
   }
 
@@ -551,9 +556,9 @@ class minimizeAndHashTask extends Task
    * Returns the filename of a file which includes the MD5 sum of the file.
    * E.g. /js/jquery/jquery.js =>  /js/jquery/jquery-0707313a8cdc41572e84b403711e7c75.js
    *
-   * @param $theIncludeFileInfo array.
+   * @param array $theIncludeFileInfo
    *
-   * @return string
+   * @return string The filename with MD5 hash.
    */
   private function makePathWidthHash( $theIncludeFileInfo )
   {
@@ -789,7 +794,7 @@ class minimizeAndHashTask extends Task
     }
     else
     {
-      throw new BuildException('Internal error.');
+      throw new BuildException( 'Internal error.' );
     }
 
     return $path_parts['dirname'].'/'.$filename.'.'.$path_parts['extension'];
@@ -816,6 +821,12 @@ class minimizeAndHashTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Sets the mode of a file.
+   *
+   * @param string $theFilename The filename.
+   * @param string $theMode     The file mode bits.
+   *
+   * @throws BuildException
    */
   private function setFilePermissions( $theFilename, $theMode )
   {
