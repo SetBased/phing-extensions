@@ -25,7 +25,7 @@ We recommend to install setbased/phing via [Composer](https://getcomposer.org/):
 ```json
 {
 	"require-dev": {
-		"setbased/phing": "1.*"
+		"setbased/phing-extensions": "1.*"
 	}
 }
 ```
