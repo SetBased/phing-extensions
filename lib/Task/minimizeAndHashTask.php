@@ -722,7 +722,7 @@ class minimizeAndHashTask extends Task
         $this->setModificationTime( $file_info['full_path_name'], $file_info['full_path_name_with_hash'] );
       }
 
-      // If required preserve file eprmissions.
+      // If required preserve file permissions.
       if ($this->myPreserveModificationTime)
       {
         $this->setFilePermissions( $file_info['full_path_name_with_hash'], $file_info['mode'] );
