@@ -1,5 +1,5 @@
 {
-  "name": "setbased/phing",
+  "name": "setbased/phing-extensions",
   "description": "A collection of Phing extensions.",
   "type": "library",
   "keyword": ["Phing", "Extensions"],
