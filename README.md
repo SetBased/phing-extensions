@@ -16,7 +16,7 @@ minimizeAndHashTask is a Phing extension that does basically three things:
   	 
 ## readSemanticVersionTask
 readSemanticVersionTask is a Phing extension that asks the user for [Semantic version](http://semver.org/) and validates 
-the given input is a valid [Semantic version](http://semver.org/). The version number and it parts are available
+the given input is a valid [Semantic version](http://semver.org/). The version number and its parts are available
 in variables for further usage in the Phing build script. 	    
 
 # Installation

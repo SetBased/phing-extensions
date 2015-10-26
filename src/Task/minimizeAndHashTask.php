@@ -166,7 +166,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theCompressorPath string The path to the YUI compressor
    */
-  public function setCompressorPath( $theCompressorPath )
+  public function setCompressorPath($theCompressorPath)
   {
     $this->myCompressorPath = $theCompressorPath;
   }
@@ -177,7 +177,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theGzipFlag bool.
    */
-  public function setGzip( $theGzipFlag = false )
+  public function setGzip($theGzipFlag = false)
   {
     $this->myGzipFlag = (boolean)$theGzipFlag;
   }
@@ -188,7 +188,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theHaltOnError
    */
-  public function setHaltOnError( $theHaltOnError )
+  public function setHaltOnError($theHaltOnError)
   {
     $this->myHaltOnError = (boolean)$theHaltOnError;
   }
@@ -199,7 +199,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theIncludes string The ID of the fileset with include sources.
    */
-  public function setIncludes( $theIncludes )
+  public function setIncludes($theIncludes)
   {
     $this->myIncludes = $theIncludes;
   }
@@ -210,7 +210,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $thePreserveLastModifiedFlag bool
    */
-  public function setPreserveLastModified( $thePreserveLastModifiedFlag )
+  public function setPreserveLastModified($thePreserveLastModifiedFlag)
   {
     $this->myPreserveModificationTime = (boolean)$thePreserveLastModifiedFlag;
   }
@@ -221,7 +221,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $thePreservePermissionsFlag bool
    */
-  public function setPreservePermissions( $thePreservePermissionsFlag )
+  public function setPreservePermissions($thePreservePermissionsFlag)
   {
     $this->myPreserveModificationPermissions = (boolean)$thePreservePermissionsFlag;
   }
@@ -232,7 +232,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theResourceDir string The path to the resource dir.
    */
-  public function setResourceDir( $theResourceDir )
+  public function setResourceDir($theResourceDir)
   {
     $this->myResourceDir = $theResourceDir;
   }
@@ -243,7 +243,7 @@ class minimizeAndHashTask extends Task
    *
    * @param $theSources string The ID of the fileset with include sources.
    */
-  public function setSources( $theSources )
+  public function setSources($theSources)
   {
     $this->mySources = $theSources;
   }
@@ -257,30 +257,30 @@ class minimizeAndHashTask extends Task
    *
    * @throws BuildException Throw build error if the duplicate files exist.
    */
-  private function checkMultipleMinimizedFiles( $theFullPathName )
+  private function checkMultipleMinimizedFiles($theFullPathName)
   {
-    $path_parts = pathinfo( $theFullPathName );
+    $path_parts = pathinfo($theFullPathName);
 
-    $postfix = substr( $path_parts['filename'], -4 );
+    $postfix = substr($path_parts['filename'], -4);
 
     if ($postfix=='-min')
     {
-      $filename       = substr( $path_parts['filename'], 0, (strlen( $path_parts['filename'] ) - 4) ).'.min';
+      $filename       = substr($path_parts['filename'], 0, (strlen($path_parts['filename']) - 4)).'.min';
       $full_path_name = $path_parts['dirname'].'/'.$filename.'.'.$path_parts['extension'];
 
-      if ($this->myIncludeFilesInfo[$full_path_name]) $this->logError( "Found duplicate files '%s' and '%s'.",
-                                                                       $theFullPathName,
-                                                                       $full_path_name );
+      if ($this->myIncludeFilesInfo[$full_path_name]) $this->logError("Found duplicate files '%s' and '%s'.",
+                                                                      $theFullPathName,
+                                                                      $full_path_name);
     }
 
     if ($postfix=='.min')
     {
-      $filename       = substr( $path_parts['filename'], 0, (strlen( $path_parts['filename'] ) - 4) ).'-min';
+      $filename       = substr($path_parts['filename'], 0, (strlen($path_parts['filename']) - 4)).'-min';
       $full_path_name = $path_parts['dirname'].'/'.$filename.'.'.$path_parts['extension'];
 
-      if ($this->myIncludeFilesInfo[$full_path_name]) $this->logError( "Found duplicate files '%s' and '%s'.",
-                                                                       $theFullPathName,
-                                                                       $full_path_name );
+      if ($this->myIncludeFilesInfo[$full_path_name]) $this->logError("Found duplicate files '%s' and '%s'.",
+                                                                      $theFullPathName,
+                                                                      $full_path_name);
     }
   }
 
@@ -293,10 +293,10 @@ class minimizeAndHashTask extends Task
    * @throws BuildException
    * @return int
    */
-  private function getFilePermissions( $theFilename )
+  private function getFilePermissions($theFilename)
   {
-    $perms = fileperms( $theFilename );
-    if ($perms===false) $this->logError( "Unable to get permissions of file '%s'.", $theFilename );
+    $perms = fileperms($theFilename);
+    if ($perms===false) $this->logError("Unable to get permissions of file '%s'.", $theFilename);
 
     return $perms;
   }
@@ -307,16 +307,16 @@ class minimizeAndHashTask extends Task
    *
    * @param $theIncludeFileInfo array  The file info for which need to get the hash.
    */
-  private function getHashMinimizedFile( &$theIncludeFileInfo )
+  private function getHashMinimizedFile(&$theIncludeFileInfo)
   {
-    $file_content = file_get_contents( $theIncludeFileInfo['full_temp_name'] );
+    $file_content = file_get_contents($theIncludeFileInfo['full_temp_name']);
 
-    if ($file_content===false) $this->logError( "Can not read the file '%s' or file does not exist.",
-                                                $theIncludeFileInfo['full_temp_name'] );
+    if ($file_content===false) $this->logError("Can not read the file '%s' or file does not exist.",
+                                               $theIncludeFileInfo['full_temp_name']);
 
-    $theIncludeFileInfo['hash']                           = md5( $file_content );
-    $theIncludeFileInfo['full_path_name_with_hash']       = $this->makePathWidthHash( $theIncludeFileInfo );
-    $theIncludeFileInfo['path_name_in_sources_with_hash'] = $this->getPathInSources( $theIncludeFileInfo['full_path_name_with_hash'] );
+    $theIncludeFileInfo['hash']                           = md5($file_content);
+    $theIncludeFileInfo['full_path_name_with_hash']       = $this->makePathWidthHash($theIncludeFileInfo);
+    $theIncludeFileInfo['path_name_in_sources_with_hash'] = $this->getPathInSources($theIncludeFileInfo['full_path_name_with_hash']);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -327,12 +327,12 @@ class minimizeAndHashTask extends Task
    *
    * @return array
    */
-  private function getIncludeFilesInSource( $theSourceFileContent )
+  private function getIncludeFilesInSource($theSourceFileContent)
   {
-    $include_files = array();
+    $include_files = [];
     foreach ($this->myIncludeFilesInfo as $file_info)
     {
-      if (strpos( $theSourceFileContent, $file_info['path_name_in_sources_with_hash'] )!==false)
+      if (strpos($theSourceFileContent, $file_info['path_name_in_sources_with_hash'])!==false)
       {
         $include_files[] = $file_info;
       }
@@ -347,20 +347,20 @@ class minimizeAndHashTask extends Task
    */
   private function getInfoIncludeFiles()
   {
-    $this->logVerbose( 'Get include files info.' );
+    $this->logVerbose('Get include files info.');
 
     foreach ($this->myIncludeFileNames as $filename)
     {
       clearstatcache();
 
       $path      = $this->myIncludeBaseDir.'/'.$filename;
-      $full_path = realpath( $path );
+      $full_path = realpath($path);
 
-      $this->myIncludeFilesInfo[$full_path] = array('filename_in_fileset'  => $filename,
-                                                    'full_path_name'       => $full_path,
-                                                    'full_temp_name'       => $full_path.'.tmp',
-                                                    'path_name_in_sources' => $this->getPathInSources( $full_path ),
-                                                    'mode'                 => $this->getFilePermissions( $full_path ));
+      $this->myIncludeFilesInfo[$full_path] = ['filename_in_fileset'  => $filename,
+                                               'full_path_name'       => $full_path,
+                                               'full_temp_name'       => $full_path.'.tmp',
+                                               'path_name_in_sources' => $this->getPathInSources($full_path),
+                                               'mode'                 => $this->getFilePermissions($full_path)];
     }
   }
 
@@ -370,7 +370,7 @@ class minimizeAndHashTask extends Task
    */
   private function getInfoSourceFiles()
   {
-    $this->logVerbose( 'Get source files info.' );
+    $this->logVerbose('Get source files info.');
 
     foreach ($this->mySourceFileNames as $theFileName)
     {
@@ -387,23 +387,23 @@ class minimizeAndHashTask extends Task
    *
    * @return int
    */
-  private function getMaxModificationTime( $theSourceFilename, $theContent )
+  private function getMaxModificationTime($theSourceFilename, $theContent)
   {
-    $times = array();
+    $times = [];
 
-    $time = filemtime( $theSourceFilename );
-    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theSourceFilename );
+    $time = filemtime($theSourceFilename);
+    if ($time===false) $this->logError("Unable to get mtime of file '%s'.", $theSourceFilename);
     $times[] = $time;
 
-    $include_files_info = $this->getIncludeFilesInSource( $theContent );
+    $include_files_info = $this->getIncludeFilesInSource($theContent);
     foreach ($include_files_info as $include_file_info)
     {
-      $time = filemtime( $include_file_info['full_path_name_with_hash'] );
-      if ($time===false) $this->logError( "Unable to get mtime for file '%s'.", $include_file_info );
+      $time = filemtime($include_file_info['full_path_name_with_hash']);
+      if ($time===false) $this->logError("Unable to get mtime for file '%s'.", $include_file_info);
       $times[] = $time;
     }
 
-    return max( $times );
+    return max($times);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -415,14 +415,14 @@ class minimizeAndHashTask extends Task
    * @throws BuildException
    * @return string Return name of the file which use for include file in source.
    */
-  private function getPathInSources( $thePath )
+  private function getPathInSources($thePath)
   {
-    if (strncmp( $thePath, $this->myResourceDirFullPath, strlen( $this->myResourceDirFullPath ) )!=0)
+    if (strncmp($thePath, $this->myResourceDirFullPath, strlen($this->myResourceDirFullPath))!=0)
     {
-      throw new BuildException( 'Internal error.' );
+      throw new BuildException('Internal error.');
     }
 
-    return substr( $thePath, strlen( $this->myResourceDirFullPath ) );
+    return substr($thePath, strlen($this->myResourceDirFullPath));
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -431,48 +431,48 @@ class minimizeAndHashTask extends Task
    */
   private function gzipCompress()
   {
-    $this->logInfo( 'Gzip compressing files.' );
+    $this->logInfo('Gzip compressing files.');
 
     foreach ($this->myIncludeFilesInfo as $file_info)
     {
-      $this->logVerbose( "Gzip compressing file '%s' to '%s'.",
-                         $file_info['full_path_name_with_hash'],
-                         $file_info['full_path_name_with_hash'].'.gz' );
+      $this->logVerbose("Gzip compressing file '%s' to '%s'.",
+                        $file_info['full_path_name_with_hash'],
+                        $file_info['full_path_name_with_hash'].'.gz');
 
       // Get data from the file.
-      $data = file_get_contents( $file_info['full_path_name_with_hash'] );
+      $data = file_get_contents($file_info['full_path_name_with_hash']);
       if ($data===false)
       {
-        $this->logError( "Can not read the file '%s' or file does not exist.",
-                         $file_info['full_path_name_with_hash'] );
+        $this->logError("Can not read the file '%s' or file does not exist.",
+                        $file_info['full_path_name_with_hash']);
       }
 
       // Compress data with gzip
-      $data = gzencode( $data, 9 );
+      $data = gzencode($data, 9);
       if ($data===false)
       {
-        $this->logError( "Can not write the file '%s' or file does not exist.",
-                         $file_info['full_path_name_with_hash'].'.gz' );
+        $this->logError("Can not write the file '%s' or file does not exist.",
+                        $file_info['full_path_name_with_hash'].'.gz');
       }
 
       // Write data to the file.
-      $status = file_put_contents( $file_info['full_path_name_with_hash'].'.gz', $data );
+      $status = file_put_contents($file_info['full_path_name_with_hash'].'.gz', $data);
       if ($status===false)
       {
-        $this->logError( "Unable to write to file '%s",
-                         $file_info['full_path_name_with_hash'].'.gz' );
+        $this->logError("Unable to write to file '%s",
+                        $file_info['full_path_name_with_hash'].'.gz');
       }
 
       // If required preserve mtime.
       if ($this->myPreserveModificationTime)
       {
-        $this->setModificationTime( $file_info['full_path_name_with_hash'], $file_info['full_path_name_with_hash'].'.gz' );
+        $this->setModificationTime($file_info['full_path_name_with_hash'], $file_info['full_path_name_with_hash'].'.gz');
       }
 
       // If required preserve file permissions.
       if ($this->myPreserveModificationTime)
       {
-        $this->setFilePermissions( $file_info['full_path_name_with_hash'].'.gz', $file_info['mode'] );
+        $this->setFilePermissions($file_info['full_path_name_with_hash'].'.gz', $file_info['mode']);
       }
     }
   }
@@ -485,11 +485,11 @@ class minimizeAndHashTask extends Task
    *
    * @return bool Return true if the file is already minimized otherwise return false.
    */
-  private function isMinimizedFilename( $theFullPathName )
+  private function isMinimizedFilename($theFullPathName)
   {
-    $path_parts = pathinfo( $theFullPathName );
+    $path_parts = pathinfo($theFullPathName);
 
-    $postfix = substr( $path_parts['filename'], -4 );
+    $postfix = substr($path_parts['filename'], -4);
 
     if ($postfix=='-min' || $postfix=='.min')
     {
@@ -508,15 +508,15 @@ class minimizeAndHashTask extends Task
   private function logError()
   {
     $args   = func_get_args();
-    $format = array_shift( $args );
+    $format = array_shift($args);
 
     foreach ($args as &$arg)
     {
-      if (!is_scalar( $arg )) $arg = var_export( $arg, true );
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    if ($this->myHaltOnError) throw new BuildException( vsprintf( $format, $args ) );
-    else $this->log( vsprintf( $format, $args ), Project::MSG_ERR );
+    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
+    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -525,14 +525,14 @@ class minimizeAndHashTask extends Task
   private function logInfo()
   {
     $args   = func_get_args();
-    $format = array_shift( $args );
+    $format = array_shift($args);
 
     foreach ($args as &$arg)
     {
-      if (!is_scalar( $arg )) $arg = var_export( $arg, true );
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log( vsprintf( $format, $args ), Project::MSG_INFO );
+    $this->log(vsprintf($format, $args), Project::MSG_INFO);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -541,14 +541,14 @@ class minimizeAndHashTask extends Task
   private function logVerbose()
   {
     $args   = func_get_args();
-    $format = array_shift( $args );
+    $format = array_shift($args);
 
     foreach ($args as &$arg)
     {
-      if (!is_scalar( $arg )) $arg = var_export( $arg, true );
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log( vsprintf( $format, $args ), Project::MSG_VERBOSE );
+    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -560,15 +560,15 @@ class minimizeAndHashTask extends Task
    *
    * @return string The filename with MD5 hash.
    */
-  private function makePathWidthHash( $theIncludeFileInfo )
+  private function makePathWidthHash($theIncludeFileInfo)
   {
     if ($theIncludeFileInfo['is_minimized'])
     {
-      $path_parts = pathinfo( $this->removeMinFilename( $theIncludeFileInfo['full_path_name'] ) );
+      $path_parts = pathinfo($this->removeMinFilename($theIncludeFileInfo['full_path_name']));
     }
     else
     {
-      $path_parts = pathinfo( $theIncludeFileInfo['full_path_name'] );
+      $path_parts = pathinfo($theIncludeFileInfo['full_path_name']);
     }
 
     return $path_parts['dirname'].'/'.$path_parts['filename'].'-'.$theIncludeFileInfo['hash'].'.'.$path_parts['extension'];
@@ -580,15 +580,15 @@ class minimizeAndHashTask extends Task
    *
    * @param $theIncludeFileInfo array Info of the file that must be compressed.
    */
-  private function minimizeIncludeFile( $theIncludeFileInfo )
+  private function minimizeIncludeFile($theIncludeFileInfo)
   {
-    $this->logInfo( "Minimizing '%s'.", $theIncludeFileInfo['full_path_name'] );
+    $this->logInfo("Minimizing '%s'.", $theIncludeFileInfo['full_path_name']);
 
-    $command = 'java -jar '.escapeshellarg( $this->myCompressorPath ).' '.
-      escapeshellarg( $theIncludeFileInfo['full_path_name'] ).
-      ' -o '.escapeshellarg( $theIncludeFileInfo['full_temp_name'] );
+    $command = 'java -jar '.escapeshellarg($this->myCompressorPath).' '.
+      escapeshellarg($theIncludeFileInfo['full_path_name']).
+      ' -o '.escapeshellarg($theIncludeFileInfo['full_temp_name']);
 
-    exec( $command, $output, $return_var );
+    exec($command, $output, $return_var);
 
     if ($return_var!=0)
     {
@@ -598,9 +598,9 @@ class minimizeAndHashTask extends Task
         $msg .= $text."\n";
       }
 
-      $this->logError( "Failed to minimize file '%s' with messages:\n%s",
-                       $theIncludeFileInfo['full_path_name'],
-                       $msg );
+      $this->logError("Failed to minimize file '%s' with messages:\n%s",
+                      $theIncludeFileInfo['full_path_name'],
+                      $msg);
     }
   }
 
@@ -613,25 +613,25 @@ class minimizeAndHashTask extends Task
   {
     foreach ($this->myIncludeFilesInfo as &$file_info)
     {
-      if ($this->isMinimizedFilename( $file_info['full_path_name'] ))
+      if ($this->isMinimizedFilename($file_info['full_path_name']))
       {
         // Test for possible duplicate minimized files.
-        $this->checkMultipleMinimizedFiles( $file_info['full_path_name'] );
+        $this->checkMultipleMinimizedFiles($file_info['full_path_name']);
 
         // Make name of possible alternative not minimized file.
-        $alternative_full_path_name = $this->removeMinFilename( $file_info['full_path_name'] );
+        $alternative_full_path_name = $this->removeMinFilename($file_info['full_path_name']);
 
         // If alternative file exist remove the file and file info about it.
         if (isset($this->myIncludeFilesInfo[$alternative_full_path_name]))
         {
           unset($this->myIncludeFilesInfo[$alternative_full_path_name]);
-          unlink( $alternative_full_path_name );
-          $this->logInfo( "Removed '%s'.", $alternative_full_path_name );
+          unlink($alternative_full_path_name);
+          $this->logInfo("Removed '%s'.", $alternative_full_path_name);
         }
 
         // Update the info about minimized file.
         $file_info['is_minimized']                     = true;
-        $file_info['path_name_in_sources_alternative'] = $this->removeMinFilename( $file_info['path_name_in_sources'] );
+        $file_info['path_name_in_sources_alternative'] = $this->removeMinFilename($file_info['path_name_in_sources']);
       }
       else
       {
@@ -646,7 +646,7 @@ class minimizeAndHashTask extends Task
    */
   private function preparePlaceHolders()
   {
-    $this->logVerbose( 'Prepare place holders.' );
+    $this->logVerbose('Prepare place holders.');
 
     foreach ($this->myIncludeFilesInfo as $file_info)
     {
@@ -667,24 +667,24 @@ class minimizeAndHashTask extends Task
    */
   private function prepareProjectData()
   {
-    $this->logVerbose( 'Get source and include file names.' );
+    $this->logVerbose('Get source and include file names.');
 
     // Get file list form the project by fileset ID.
-    $includes                 = $this->myProject->getReference( $this->myIncludes );
-    $this->myIncludeFileNames = $includes->getDirectoryScanner( $this->myProject )->getIncludedFiles();
+    $includes                 = $this->myProject->getReference($this->myIncludes);
+    $this->myIncludeFileNames = $includes->getDirectoryScanner($this->myProject)->getIncludedFiles();
 
     // Get base name of include dir from project.
-    $this->myIncludeBaseDir = $includes->getDir( $this->myProject );
+    $this->myIncludeBaseDir = $includes->getDir($this->myProject);
 
     // Get file list form the project by fileset ID.
-    $sources                 = $this->myProject->getReference( $this->mySources );
-    $this->mySourceFileNames = $sources->getDirectoryScanner( $this->myProject )->getIncludedFiles();
+    $sources                 = $this->myProject->getReference($this->mySources);
+    $this->mySourceFileNames = $sources->getDirectoryScanner($this->myProject)->getIncludedFiles();
 
     // Get base name of source dir from project.
-    $this->mySourcesBaseDir = $sources->getDir( $this->myProject );
+    $this->mySourcesBaseDir = $sources->getDir($this->myProject);
 
     // Get full path name of resource dir.
-    $this->myResourceDirFullPath = realpath( $this->myIncludeBaseDir.'/'.$this->myResourceDir );
+    $this->myResourceDirFullPath = realpath($this->myIncludeBaseDir.'/'.$this->myResourceDir);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -698,38 +698,38 @@ class minimizeAndHashTask extends Task
       if ($file_info['is_minimized'])
       {
         // If file is minimized copy it with temp name.
-        $status = copy( $file_info['full_path_name'], $file_info['full_temp_name'] );
+        $status = copy($file_info['full_path_name'], $file_info['full_temp_name']);
 
-        if (!$status) $this->logError( "Can not rename file: '%s' to '%s'.",
-                                       $file_info['full_path_name'],
-                                       $file_info['full_temp_name'] );
+        if (!$status) $this->logError("Can not rename file: '%s' to '%s'.",
+                                      $file_info['full_path_name'],
+                                      $file_info['full_temp_name']);
       }
       else
       {
         // If file is not minimized compress and save it with temp name.
-        $this->minimizeIncludeFile( $file_info );
+        $this->minimizeIncludeFile($file_info);
       }
 
       // Get hash for the compressed file.
-      $this->getHashMinimizedFile( $file_info );
+      $this->getHashMinimizedFile($file_info);
 
       // Rename compressed temp file with hash.
-      $this->renameIncludeFile( $file_info );
+      $this->renameIncludeFile($file_info);
 
       // If required preserve mtime.
       if ($this->myPreserveModificationTime)
       {
-        $this->setModificationTime( $file_info['full_path_name'], $file_info['full_path_name_with_hash'] );
+        $this->setModificationTime($file_info['full_path_name'], $file_info['full_path_name_with_hash']);
       }
 
       // If required preserve file permissions.
       if ($this->myPreserveModificationTime)
       {
-        $this->setFilePermissions( $file_info['full_path_name_with_hash'], $file_info['mode'] );
+        $this->setFilePermissions($file_info['full_path_name_with_hash'], $file_info['mode']);
       }
 
       // Remove the original file.
-      unlink( $file_info['full_path_name'] );
+      unlink($file_info['full_path_name']);
     }
   }
 
@@ -739,14 +739,14 @@ class minimizeAndHashTask extends Task
    */
   private function processingSourceFiles()
   {
-    $this->logVerbose( 'Replace include files with new compressed files.' );
+    $this->logVerbose('Replace include files with new compressed files.');
 
     foreach ($this->mySourceFilesInfo as $source_filename)
     {
-      $content = file_get_contents( $source_filename );
-      if ($content===false) $this->logError( "Unable to read file '%s'.", $source_filename );
+      $content = file_get_contents($source_filename);
+      if ($content===false) $this->logError("Unable to read file '%s'.", $source_filename);
 
-      $new_content = strtr( $content, $this->myReplacePairs );
+      $new_content = strtr($content, $this->myReplacePairs);
 
       if ($content!=$new_content)
       {
@@ -755,19 +755,19 @@ class minimizeAndHashTask extends Task
         // If required determine the latest modification time of the source file and its include files.
         if ($this->myPreserveModificationTime)
         {
-          $time = $this->getMaxModificationTime( $source_filename, $new_content );
+          $time = $this->getMaxModificationTime($source_filename, $new_content);
         }
 
         // Write sources file with modified include file names.
-        $status = file_put_contents( $source_filename, $new_content );
-        if ($status===false) $this->logError( "Updating file '%s' failed.", $source_filename );
-        $this->logInfo( "Updated file '%s'.", $source_filename );
+        $status = file_put_contents($source_filename, $new_content);
+        if ($status===false) $this->logError("Updating file '%s' failed.", $source_filename);
+        $this->logInfo("Updated file '%s'.", $source_filename);
 
         // If required set the mtime to the latest modification time of the source file and its include files.
         if ($this->myPreserveModificationTime)
         {
-          $status = touch( $source_filename, $time );
-          if ($status===false) $this->logError( "Unable to set mtime for file '%s'.", $source_filename );
+          $status = touch($source_filename, $time);
+          if ($status===false) $this->logError("Unable to set mtime for file '%s'.", $source_filename);
         }
       }
     }
@@ -782,19 +782,19 @@ class minimizeAndHashTask extends Task
    * @throws BuildException
    * @return string Return the full file name without part '-min' or '.min'.
    */
-  private function removeMinFilename( $FullPathName )
+  private function removeMinFilename($FullPathName)
   {
-    $path_parts = pathinfo( $FullPathName );
+    $path_parts = pathinfo($FullPathName);
 
-    $postfix = substr( $path_parts['filename'], -4 );
+    $postfix = substr($path_parts['filename'], -4);
 
     if ($postfix=='-min' || $postfix=='.min')
     {
-      $filename = substr( $path_parts['filename'], 0, (strlen( $path_parts['filename'] ) - 4) );
+      $filename = substr($path_parts['filename'], 0, (strlen($path_parts['filename']) - 4));
     }
     else
     {
-      throw new BuildException( 'Internal error.' );
+      throw new BuildException('Internal error.');
     }
 
     return $path_parts['dirname'].'/'.$filename.'.'.$path_parts['extension'];
@@ -806,17 +806,17 @@ class minimizeAndHashTask extends Task
    *
    * @param $theIncludeFileInfo array Info about current file.
    */
-  private function renameIncludeFile( $theIncludeFileInfo )
+  private function renameIncludeFile($theIncludeFileInfo)
   {
-    $this->logVerbose( "Rename file '%s' to '%s'.",
-                       $theIncludeFileInfo['full_temp_name'],
-                       $theIncludeFileInfo['full_path_name_with_hash'] );
+    $this->logVerbose("Rename file '%s' to '%s'.",
+                      $theIncludeFileInfo['full_temp_name'],
+                      $theIncludeFileInfo['full_path_name_with_hash']);
 
-    $status = rename( $theIncludeFileInfo['full_temp_name'], $theIncludeFileInfo['full_path_name_with_hash'] );
+    $status = rename($theIncludeFileInfo['full_temp_name'], $theIncludeFileInfo['full_path_name_with_hash']);
 
-    if (!$status) $this->logError( "Can not rename file: '%s' to '%s'.",
-                                   $theIncludeFileInfo['full_temp_name'],
-                                   $theIncludeFileInfo['full_path_name_with_hash'] );
+    if (!$status) $this->logError("Can not rename file: '%s' to '%s'.",
+                                  $theIncludeFileInfo['full_temp_name'],
+                                  $theIncludeFileInfo['full_path_name_with_hash']);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -828,10 +828,10 @@ class minimizeAndHashTask extends Task
    *
    * @throws BuildException
    */
-  private function setFilePermissions( $theFilename, $theMode )
+  private function setFilePermissions($theFilename, $theMode)
   {
-    $status = chmod( $theFilename, $theMode );
-    if ($status===false) $this->logError( "Unable to set permissions for file '%s'.", $theFilename );
+    $status = chmod($theFilename, $theMode);
+    if ($status===false) $this->logError("Unable to set permissions for file '%s'.", $theFilename);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -841,17 +841,17 @@ class minimizeAndHashTask extends Task
    * @param $theSourceFilename      string The full file name of source file.
    * @param $theDestinationFilename string The full file name of destination file.
    */
-  private function setModificationTime( $theSourceFilename, $theDestinationFilename )
+  private function setModificationTime($theSourceFilename, $theDestinationFilename)
   {
-    $time = filemtime( $theSourceFilename );
-    if ($time===false) $this->logError( "Unable to get mtime of file '%s'.", $theSourceFilename );
+    $time = filemtime($theSourceFilename);
+    if ($time===false) $this->logError("Unable to get mtime of file '%s'.", $theSourceFilename);
 
-    $status = touch( $theDestinationFilename, $time );
+    $status = touch($theDestinationFilename, $time);
     if ($status===false)
     {
-      $this->logError( "Unable to set mtime of file '%s' to mtime of '%s",
-                       $theDestinationFilename,
-                       $theSourceFilename );
+      $this->logError("Unable to set mtime of file '%s' to mtime of '%s",
+                      $theDestinationFilename,
+                      $theSourceFilename);
     }
   }
 
