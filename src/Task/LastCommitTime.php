@@ -7,23 +7,36 @@ class LastCommitTime extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Param for output in console.
-   *
-   * @var bool
-   */
-  private $myVerbose;
-  /**
    * Build dir.
    *
    * @var string
    */
   private $myDir;
+
+  /**
+   * If set stop build on errors.
+   *
+   * @var bool
+   */
+  private $myHaltOnError = true;
+
   /**
    * Last commit time.
    *
    * @var string
    */
   private $myLastCommitTime;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Main method of this task.
+   */
+  public function main()
+  {
+    $this->getLastCommitTime();
+
+    $this->setFilesMtime();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -38,13 +51,40 @@ class LastCommitTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Setter for XML attribute verbose.
+   * Setter for XML attribute haltonerror.
    *
-   * @param $theVerbose
+   * @param $theHaltOnError
    */
-  public function setVerbose($theVerbose)
+  public function setHaltOnError($theHaltOnError)
   {
-    $this->myVerbose = $theVerbose;
+    $this->myHaltOnError = (boolean)$theHaltOnError;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Get last commit time.
+   */
+  private function getLastCommitTime()
+  {
+    $this->myLastCommitTime = exec('git show -s --format=%ct');
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * @throws BuildException
+   */
+  private function logError()
+  {
+    $args   = func_get_args();
+    $format = array_shift($args);
+
+    foreach ($args as &$arg)
+    {
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
+    }
+
+    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
+    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,29 +106,19 @@ class LastCommitTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   *  Called by the project to let the task do it's work. This method may be
-   *  called more than once, if the task is invoked more than once. For
-   *  example, if target1 and target2 both depend on target3, then running
-   *  <em>phing target1 target2</em> will run all tasks in target3 twice.
-   *
-   *  Should throw a BuildException if someting goes wrong with the build
-   *
-   *  This is here. Must be overloaded by real tasks.
+   * Print in console
    */
-  public function main()
+  private function logVerbose()
   {
-    $this->getLastCommitTime();
+    $args   = func_get_args();
+    $format = array_shift($args);
 
-    $this->setFilesMtime();
-  }
+    foreach ($args as &$arg)
+    {
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
+    }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Get last commit time.
-   */
-  private function getLastCommitTime()
-  {
-    $this->myLastCommitTime = exec('git show -s --format=%ct');
+    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,24 +127,20 @@ class LastCommitTime extends Task
    */
   private function setFilesMtime()
   {
-    $files    = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
-    foreach ($files as $fullpath => $file)
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
+    foreach ($files as $full_path => $file)
     {
       if ($file->isFile())
       {
-        if($this->myVerbose)
-        {
-          $this->logInfo("Set new mtime '%s'.",$fullpath);
-        }
-        if (!touch($fullpath,$this->myLastCommitTime)) {
-          throw new \SetBased\Abc\Error\RuntimeException("\nCan't touch file '%s'.\n", $fullpath);
-        }
+        $this->logVerbose("Setting mtime of file '%s'.", $full_path);
+
+        $success = touch($full_path, $this->myLastCommitTime);
+        if (!$success) $this->logError("Can not set mtime of file '%s'.", $full_path);
       }
     }
   }
-  //--------------------------------------------------------------------------------------------------------------------
 
+  //--------------------------------------------------------------------------------------------------------------------
 }
 
-
-//--------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
