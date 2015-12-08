@@ -7,6 +7,13 @@ class removeEmptyDirsTask extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * The number of empty directories removed.
+   *
+   * @var int
+   */
+  private $myCount;
+
+  /**
    * The parent directory under which all empty directories must be removed.
    *
    * @var string
@@ -35,12 +42,15 @@ class removeEmptyDirsTask extends Task
   {
     $this->logInfo("Removing empty directories under '%s'.", $this->myDirName);
 
+    $this->myCount = 0;
+
     $empty = $this->removeEmptyDirs($this->myDirName);
     if ($empty)
     {
-      $suc = rmdir($this->myDirName);
-      if ($suc===false) $this->logError("Unable to remove directory '%s'.", $this->myDirName);
+      $this->removeDir($this->myDirName);
     }
+
+    $this->logInfo("Removed %d empty directories.", $this->myCount);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,7 +88,11 @@ class removeEmptyDirsTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * @throws BuildException
+   * Prints an error message and depending on HaltOnError throws an exception.
+   *
+   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
+   *
+   * @throws \BuildException
    */
   private function logError()
   {
@@ -96,6 +110,9 @@ class removeEmptyDirsTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Prints an info message.
+   *
+   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
    */
   private function logInfo()
   {
@@ -108,6 +125,41 @@ class removeEmptyDirsTask extends Task
     }
 
     $this->log(vsprintf($format, $args), Project::MSG_INFO);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Prints a verbose level message.
+   *
+   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
+   */
+  private function logVerbose()
+  {
+    $args   = func_get_args();
+    $format = array_shift($args);
+
+    foreach ($args as &$arg)
+    {
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
+    }
+
+    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Removes a directory and does housekeeping.
+   *
+   * @param string $theDir The directory to be removed.
+   */
+  private function removeDir($theDir)
+  {
+    $this->logInfo("Removing '%s'.", $theDir);
+
+    $suc = rmdir($theDir);
+    if ($suc===false) $this->logVerbose("Unable to remove directory '%s'.", $theDir);
+
+    $this->myCount++;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,10 +191,7 @@ class removeEmptyDirsTask extends Task
         {
           unset($entries[$i]);
 
-          $this->logInfo("Removing '%s'.", $path);
-
-          $suc = rmdir($path);
-          if ($suc===false) $this->logError("Unable to remove directory '%s'.", $path);
+          $this->removeDir($path);
         }
       }
     }
