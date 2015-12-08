@@ -12,18 +12,20 @@ class LastCommitTime extends Task
    * @var bool
    */
   private $myVerbose;
+
   /**
    * Build dir.
    *
    * @var string
    */
   private $myDir;
+
   /**
-   * Last commit time.
+   * Array with last commit time for each file.
    *
-   * @var string
+   * @var array
    */
-  private $myLastCommitTime;
+  private $myLastCommitTime = [];
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -88,7 +90,22 @@ class LastCommitTime extends Task
    */
   private function getLastCommitTime()
   {
-    $this->myLastCommitTime = exec('git show -s --format=%ct');
+    exec('git log --format=format:%ai --name-only .|cat', $output);
+    $commit_date = '';
+    foreach ($output as $line)
+    {
+      if (strtotime($line)!==false)
+      {
+        $commit_date = strtotime($line);
+      }
+      else
+      {
+        if ($this->myLastCommitTime[$line]<$commit_date)
+        {
+          $this->myLastCommitTime[$line] = $commit_date;
+        }
+      }
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,17 +114,22 @@ class LastCommitTime extends Task
    */
   private function setFilesMtime()
   {
-    $files    = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
     foreach ($files as $fullpath => $file)
     {
       if ($file->isFile())
       {
-        if($this->myVerbose)
+        $key = str_replace($this->myDir.'/', '', $fullpath);
+        if (array_key_exists($key, $this->myLastCommitTime))
         {
-          $this->logInfo("Set new mtime '%s'.",$fullpath);
-        }
-        if (!touch($fullpath,$this->myLastCommitTime)) {
-          throw new \SetBased\Abc\Error\RuntimeException("\nCan't touch file '%s'.\n", $fullpath);
+          if ($this->myVerbose)
+          {
+            $this->logInfo("Set new mtime '%s'.", $fullpath);
+          }
+          if (!touch($fullpath, $this->myLastCommitTime[$key]))
+          {
+            throw new \SetBased\Abc\Error\RuntimeException("\nCan't touch file '%s'.\n", $fullpath);
+          }
         }
       }
     }
@@ -115,6 +137,5 @@ class LastCommitTime extends Task
   //--------------------------------------------------------------------------------------------------------------------
 
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
