@@ -154,10 +154,10 @@ class removeEmptyDirsTask extends Task
    */
   private function removeDir($theDir)
   {
-    $this->logInfo("Removing '%s'.", $theDir);
+    $this->logVerbose("Removing '%s'.", $theDir);
 
     $suc = rmdir($theDir);
-    if ($suc===false) $this->logVerbose("Unable to remove directory '%s'.", $theDir);
+    if ($suc===false) $this->logError("Unable to remove directory '%s'.", $theDir);
 
     $this->myCount++;
   }
