@@ -147,12 +147,12 @@ class LastCommitTime extends Task
    */
   private function setFilesMtime()
   {
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,FilesystemIterator::UNIX_PATHS));
     foreach ($files as $full_path => $file)
     {
       if ($file->isFile())
       {
-        $key = str_replace($this->myDir.'/', '', $full_path);
+        $key = substr($full_path, strlen($this->myDir.'/'));
         if (isset($this->myLastCommitTime[$key]))
         {
           $this->logVerbose("Set mtime of '%s' to '%s'.", $full_path,date('Y-m-d H:i:s',$this->myLastCommitTime[$key]));
