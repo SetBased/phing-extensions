@@ -1,13 +1,13 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class LastCommitTime
+ * Phing task for set the mtime of (source) file to the latest commit in GIT.
  */
 class LastCommitTime extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Build dir.
+   * The parent directory under which the mtime of (source) files must be set.
    *
    * @var string
    */
@@ -51,7 +51,7 @@ class LastCommitTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Setter for XML attribute haltonerror.
+   * Setter for XML attribute haltOnError.
    *
    * @param $theHaltOnError
    */
@@ -111,23 +111,6 @@ class LastCommitTime extends Task
   /**
    * Print in console
    */
-  private function logInfo()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Print in console
-   */
   private function logVerbose()
   {
     $args   = func_get_args();
@@ -147,7 +130,8 @@ class LastCommitTime extends Task
    */
   private function setFilesMtime()
   {
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,FilesystemIterator::UNIX_PATHS));
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,
+                                                                          FilesystemIterator::UNIX_PATHS));
     foreach ($files as $full_path => $file)
     {
       if ($file->isFile())
@@ -155,20 +139,19 @@ class LastCommitTime extends Task
         $key = substr($full_path, strlen($this->myDir.'/'));
         if (isset($this->myLastCommitTime[$key]))
         {
-          $this->logVerbose("Set mtime of '%s' to '%s'.", $full_path,date('Y-m-d H:i:s',$this->myLastCommitTime[$key]));
+          $this->logVerbose("Set mtime of '%s' to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTime[$key]));
           $success = touch($full_path, $this->myLastCommitTime[$key]);
           if (!$success)
           {
-            $this->logError("\nCan't touch file '%s'.\n", $full_path);
+            $this->logError("Unable to set mtime of file '%s'.", $full_path);
           }
         }
       }
     }
   }
 
-  //----------------------------------------------------------------------------------------------------------------------
-
+  //--------------------------------------------------------------------------------------------------------------------
 }
 
-//--------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
