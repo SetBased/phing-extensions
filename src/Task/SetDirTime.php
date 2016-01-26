@@ -72,7 +72,7 @@ class SetDirTime extends Task
       if ($object->isDir())
       {
         $mtime = $this->getLastMTime($path);
-        if ($mtime!=0)
+        if (isset($mtime))
         {
           $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
           $success = touch($path, $mtime);
@@ -164,13 +164,13 @@ class SetDirTime extends Task
     $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($theDir, FilesystemIterator::SKIP_DOTS),
                                              RecursiveIteratorIterator::SELF_FIRST);
 
-    $mtime = [];
+    $mtime = 0;
     foreach ($objects as $object)
     {
-      $mtime[] = $object->getMTime();
+      $mtime = max($mtime, $object->getMTime());
     }
 
-    return (count($mtime)>0) ? max($mtime) : 0;
+    return ($mtime>0) ? $mtime : null;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
