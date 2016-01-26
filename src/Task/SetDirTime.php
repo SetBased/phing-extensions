@@ -1,7 +1,7 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class LastCommitTime
+ * Class SetDirTime
  */
 class SetDirTime extends Task
 {
@@ -20,13 +20,6 @@ class SetDirTime extends Task
    */
   private $myHaltOnError = true;
 
-  /**
-   * Array with last commit time for each file.
-   *
-   * @var array
-   */
-  private $myLastCommitTime = [];
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
@@ -35,6 +28,13 @@ class SetDirTime extends Task
   {
     $this->setDirMtime();
   }
+
+  /**
+   * Param for output in console.
+   *
+   * @var bool
+   */
+  private $myVerbose;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -72,13 +72,14 @@ class SetDirTime extends Task
       if ($object->isDir())
       {
         $mtime = $this->getLastMTime($path);
-        if ($mtime==0) $mtime = $object->getMTime();
-
-        $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
-        $success = touch($path, $mtime);
-        if (!$success)
+        if ($mtime!=0)
         {
-          $this->logError("\nCan't touch dir '%s'.\n", $path);
+          $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
+          $success = touch($path, $mtime);
+          if (!$success)
+          {
+            $this->logError("\nCan't touch dir '%s'.\n", $path);
+          }
         }
       }
     }
@@ -100,6 +101,18 @@ class SetDirTime extends Task
 
     if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
     else $this->log(vsprintf($format, $args), Project::MSG_ERR);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   *
+   * Setter for XML attribute verbose.
+   *
+   * @param $theVerbose
+   */
+  public function setVerbose($theVerbose)
+  {
+    $this->myVerbose = $theVerbose;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,7 +173,7 @@ class SetDirTime extends Task
     return (count($mtime)>0) ? max($mtime) : 0;
   }
 
-  //----------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
 
 }
 
