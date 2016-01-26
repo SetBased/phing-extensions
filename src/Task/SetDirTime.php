@@ -1,9 +1,9 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class LastCommitTime
+ * Class SetDirTime
  */
-class LastCommitTime extends Task
+class SetDirTime extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -20,23 +20,21 @@ class LastCommitTime extends Task
    */
   private $myHaltOnError = true;
 
-  /**
-   * Array with last commit time for each file.
-   *
-   * @var array
-   */
-  private $myLastCommitTime = [];
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
    */
   public function main()
   {
-    $this->getLastCommitTime();
-
-    $this->setFilesMtime();
+    $this->setDirMtime();
   }
+
+  /**
+   * Param for output in console.
+   *
+   * @var bool
+   */
+  private $myVerbose;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -64,26 +62,24 @@ class LastCommitTime extends Task
   /**
    * Get last commit time of each file in the GIT repository.
    */
-  private function getLastCommitTime()
+  private function setDirMtime()
   {
-    // Execute command for get list with file name and mtime from GIT log
-    $command = 'git log --format=format:%ai --name-only';
-    exec($command, $output, $return);
-    if ($return!=0) $this->logError("Can not execute command '%s' in exec", $command);
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir, FilesystemIterator::SKIP_DOTS),
+                                             RecursiveIteratorIterator::CHILD_FIRST);
 
-    // Find latest mtime for each file from $output
-    $commit_date = '';
-    foreach ($output as $line)
+    foreach ($objects as $path => $object)
     {
-      if (strtotime($line)!==false)
+      if ($object->isDir())
       {
-        $commit_date = strtotime($line);
-      }
-      else
-      {
-        if (!isset($this->myLastCommitTime[$line]) || $this->myLastCommitTime[$line]<$commit_date)
+        $mtime = $this->getLastMTime($path);
+        if (isset($mtime))
         {
-          $this->myLastCommitTime[$line] = $commit_date;
+          $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
+          $success = touch($path, $mtime);
+          if (!$success)
+          {
+            $this->logError("\nCan't touch dir '%s'.\n", $path);
+          }
         }
       }
     }
@@ -105,6 +101,18 @@ class LastCommitTime extends Task
 
     if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
     else $this->log(vsprintf($format, $args), Project::MSG_ERR);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   *
+   * Setter for XML attribute verbose.
+   *
+   * @param $theVerbose
+   */
+  public function setVerbose($theVerbose)
+  {
+    $this->myVerbose = $theVerbose;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -143,30 +151,29 @@ class LastCommitTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Set last commit time to all files in build directory.
+   * Get last commit time from all files in directory.
+   *
+   * @param $theDir
+   *
+   * @return mixed
+   *
+   * @throws BuildException
    */
-  private function setFilesMtime()
+  private function getLastMTime($theDir)
   {
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir));
-    foreach ($files as $full_path => $file)
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($theDir, FilesystemIterator::SKIP_DOTS),
+                                             RecursiveIteratorIterator::SELF_FIRST);
+
+    $mtime = 0;
+    foreach ($objects as $object)
     {
-      if ($file->isFile())
-      {
-        $key = str_replace($this->myDir.'/', '', $full_path);
-        if (isset($this->myLastCommitTime[$key]))
-        {
-          $this->logVerbose("Set mtime of '%s' to '%s'.", $full_path,date('Y-m-d H:i:s',$this->myLastCommitTime[$key]));
-          $success = touch($full_path, $this->myLastCommitTime[$key]);
-          if (!$success)
-          {
-            $this->logError("\nCan't touch file '%s'.\n", $full_path);
-          }
-        }
-      }
+      $mtime = max($mtime, $object->getMTime());
     }
+
+    return ($mtime>0) ? $mtime : null;
   }
 
-  //----------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
 
 }
 
