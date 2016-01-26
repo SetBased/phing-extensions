@@ -21,11 +21,11 @@ class LastCommitTime extends Task
   private $myHaltOnError = true;
 
   /**
-   * Last commit time.
+   * Array with last commit time for each file.
    *
-   * @var string
+   * @var array
    */
-  private $myLastCommitTime;
+  private $myLastCommitTime = [];
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -62,11 +62,31 @@ class LastCommitTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get last commit time.
+   * Get last commit time of each file in the GIT repository.
    */
   private function getLastCommitTime()
   {
-    $this->myLastCommitTime = exec('git show -s --format=%ct');
+    // Execute command for get list with file name and mtime from GIT log
+    $command = 'git log --format=format:%ai --name-only';
+    exec($command, $output, $return);
+    if ($return!=0) $this->logError("Can not execute command '%s' in exec", $command);
+
+    // Find latest mtime for each file from $output
+    $commit_date = '';
+    foreach ($output as $line)
+    {
+      if (strtotime($line)!==false)
+      {
+        $commit_date = strtotime($line);
+      }
+      else
+      {
+        if (!isset($this->myLastCommitTime[$line]) || $this->myLastCommitTime[$line]<$commit_date)
+        {
+          $this->myLastCommitTime[$line] = $commit_date;
+        }
+      }
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,15 +152,23 @@ class LastCommitTime extends Task
     {
       if ($file->isFile())
       {
-        $this->logVerbose("Setting mtime of file '%s'.", $full_path);
-
-        $success = touch($full_path, $this->myLastCommitTime);
-        if (!$success) $this->logError("Can not set mtime of file '%s'.", $full_path);
+        $key = str_replace($this->myDir.'/', '', $full_path);
+        if (isset($this->myLastCommitTime[$key]))
+        {
+          $this->logVerbose("Set mtime of '%s' to '%s'.", $full_path,date('Y-m-d H:i:s',$this->myLastCommitTime[$key]));
+          $success = touch($full_path, $this->myLastCommitTime[$key]);
+          if (!$success)
+          {
+            $this->logError("\nCan't touch file '%s'.\n", $full_path);
+          }
+        }
       }
     }
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------------------------------------
+
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
+
