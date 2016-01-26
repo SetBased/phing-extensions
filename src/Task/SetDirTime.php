@@ -1,25 +1,13 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
+require_once 'MTime.php';
+
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Phing task for setting recursively the mtime of a directory the the max mtime of its entries.
  */
-class SetDirTime extends Task
+class SetDirTime extends MTime
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Build dir.
-   *
-   * @var string
-   */
-  private $myDir;
-
-  /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  private $myHaltOnError = true;
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
@@ -27,28 +15,6 @@ class SetDirTime extends Task
   public function main()
   {
     $this->setDirMtime();
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute dir.
-   *
-   * @param $theDir
-   */
-  public function setDir($theDir)
-  {
-    $this->myDir = $theDir;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute haltOnError.
-   *
-   * @param $theHaltOnError
-   */
-  public function setHaltOnError($theHaltOnError)
-  {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,41 +39,6 @@ class SetDirTime extends Task
     }
 
     return $mtime;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * @throws BuildException
-   */
-  private function logError()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Print in console
-   */
-  private function logVerbose()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

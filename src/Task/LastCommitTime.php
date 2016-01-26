@@ -1,25 +1,14 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
+require_once 'MTime.php';
+
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Phing task for set the mtime of (source) file to the latest commit in GIT.
  */
-class LastCommitTime extends Task
+class LastCommitTime extends MTime
 {
   //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The parent directory under which the mtime of (source) files must be set.
-   *
-   * @var string
-   */
-  private $myDir;
-
-  /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  private $myHaltOnError = true;
-
   /**
    * Array with last commit time for each file.
    *
@@ -36,28 +25,6 @@ class LastCommitTime extends Task
     $this->getLastCommitTime();
 
     $this->setFilesMtime();
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute dir.
-   *
-   * @param $theDir
-   */
-  public function setDir($theDir)
-  {
-    $this->myDir = $theDir;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute haltOnError.
-   *
-   * @param $theHaltOnError
-   */
-  public function setHaltOnError($theHaltOnError)
-  {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,41 +54,6 @@ class LastCommitTime extends Task
         }
       }
     }
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * @throws BuildException
-   */
-  private function logError()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Print in console
-   */
-  private function logVerbose()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
