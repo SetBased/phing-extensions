@@ -1,7 +1,7 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class SetDirTime
+ * Phing task for setting recursively the mtime of a directory the the max mtime of its entries.
  */
 class SetDirTime extends Task
 {
@@ -29,13 +29,6 @@ class SetDirTime extends Task
     $this->setDirMtime();
   }
 
-  /**
-   * Param for output in console.
-   *
-   * @var bool
-   */
-  private $myVerbose;
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute dir.
@@ -49,7 +42,7 @@ class SetDirTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Setter for XML attribute haltonerror.
+   * Setter for XML attribute haltOnError.
    *
    * @param $theHaltOnError
    */
@@ -60,29 +53,26 @@ class SetDirTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get last commit time of each file in the GIT repository.
+   * Get last commit time from all files in directory.
+   *
+   * @param $theDir
+   *
+   * @return mixed
+   *
+   * @throws BuildException
    */
-  private function setDirMtime()
+  private function getLastMTime($theDir)
   {
-    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir, FilesystemIterator::SKIP_DOTS),
-                                             RecursiveIteratorIterator::CHILD_FIRST);
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($theDir, FilesystemIterator::SKIP_DOTS),
+                                             RecursiveIteratorIterator::SELF_FIRST);
 
-    foreach ($objects as $path => $object)
+    $mtime = null;
+    foreach ($objects as $object)
     {
-      if ($object->isDir())
-      {
-        $mtime = $this->getLastMTime($path);
-        if (isset($mtime))
-        {
-          $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
-          $success = touch($path, $mtime);
-          if (!$success)
-          {
-            $this->logError("\nCan't touch dir '%s'.\n", $path);
-          }
-        }
-      }
+      $mtime = max($mtime, $object->getMTime());
     }
+
+    return $mtime;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,35 +95,6 @@ class SetDirTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   *
-   * Setter for XML attribute verbose.
-   *
-   * @param $theVerbose
-   */
-  public function setVerbose($theVerbose)
-  {
-    $this->myVerbose = $theVerbose;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Print in console
-   */
-  private function logInfo()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Print in console
    */
   private function logVerbose()
@@ -151,31 +112,34 @@ class SetDirTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get last commit time from all files in directory.
-   *
-   * @param $theDir
-   *
-   * @return mixed
-   *
-   * @throws BuildException
+   * Get last commit time of each file in the GIT repository.
    */
-  private function getLastMTime($theDir)
+  private function setDirMtime()
   {
-    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($theDir, FilesystemIterator::SKIP_DOTS),
-                                             RecursiveIteratorIterator::SELF_FIRST);
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,
+                                                                            FilesystemIterator::SKIP_DOTS),
+                                             RecursiveIteratorIterator::CHILD_FIRST);
 
-    $mtime = 0;
-    foreach ($objects as $object)
+    foreach ($objects as $path => $object)
     {
-      $mtime = max($mtime, $object->getMTime());
+      if ($object->isDir())
+      {
+        $mtime = $this->getLastMTime($path);
+        if (isset($mtime))
+        {
+          $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
+          $success = touch($path, $mtime);
+          if (!$success)
+          {
+            $this->logError("Unable to set mtime of '%s'.", $path);
+          }
+        }
+      }
     }
-
-    return ($mtime>0) ? $mtime : null;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
-
 }
 
-//--------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
