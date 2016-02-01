@@ -1,13 +1,21 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
-require_once 'MTime.php';
+require_once 'SetBasedTask.php';
 
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Phing task for setting recursively the mtime of a directory the the max mtime of its entries.
+ * Phing task for setting recursively the mtime of a directory to the max mtime of its entries.
  */
-class SetDirTime extends MTime
+class SetDirTimeTask extends SetBasedTask
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * The parent directory under which the mtime of (source) files must be set.
+   *
+   * @var string
+   */
+  protected $myWorkDirName;
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
@@ -15,6 +23,17 @@ class SetDirTime extends MTime
   public function main()
   {
     $this->setDirMtime();
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Setter for XML attribute dir.
+   *
+   * @param $theDir
+   */
+  public function setDir($theDir)
+  {
+    $this->myWorkDirName = $theDir;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -47,7 +66,7 @@ class SetDirTime extends MTime
    */
   private function setDirMtime()
   {
-    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myWorkDirName,
                                                                             FilesystemIterator::SKIP_DOTS),
                                              RecursiveIteratorIterator::CHILD_FIRST);
 

@@ -1,18 +1,10 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Phing task for set the mtime of (source) file to the latest commit in GIT.
+ * Parent Phing task with all general methods and properties.
  */
-class MTime extends Task
+class SetBasedTask extends Task
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The parent directory under which the mtime of (source) files must be set.
-   *
-   * @var string
-   */
-  protected $myDir;
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * If set stop build on errors.
@@ -22,7 +14,6 @@ class MTime extends Task
   protected $myHaltOnError = true;
 
   //--------------------------------------------------------------------------------------------------------------------
-
   /**
    *  Called by the project to let the task do it's work. This method may be
    *  called more than once, if the task is invoked more than once. For
@@ -40,23 +31,10 @@ class MTime extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Setter for XML attribute dir.
-   *
-   * @param $theDir
-   */
-  public function setDir($theDir)
-  {
-    $this->myDir = $theDir;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Setter for XML attribute haltOnError.
    *
    * @param $theHaltOnError
    */
-
-  //--------------------------------------------------------------------------------------------------------------------
   public function setHaltOnError($theHaltOnError)
   {
     $this->myHaltOnError = (boolean)$theHaltOnError;
@@ -96,6 +74,23 @@ class MTime extends Task
 
     $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   */
+  protected function logInfo()
+  {
+    $args   = func_get_args();
+    $format = array_shift($args);
+
+    foreach ($args as &$arg)
+    {
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
+    }
+
+    $this->log(vsprintf($format, $args), Project::MSG_INFO);
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
 }

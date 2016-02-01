@@ -1,9 +1,12 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
+require_once 'SetBasedTask.php';
+
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Class minimizeAndHashTask
  */
-class minimizeAndHashTask extends Task
+class minimizeAndHashTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -19,13 +22,6 @@ class minimizeAndHashTask extends Task
    * @var bool
    */
   private $myGzipFlag = false;
-
-  /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  private $myHaltOnError = true;
 
   /**
    * The base dir of the include fileset.
@@ -180,17 +176,6 @@ class minimizeAndHashTask extends Task
   public function setGzip($theGzipFlag = false)
   {
     $this->myGzipFlag = (boolean)$theGzipFlag;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute haltonerror.
-   *
-   * @param $theHaltOnError
-   */
-  public function setHaltOnError($theHaltOnError)
-  {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -499,56 +484,6 @@ class minimizeAndHashTask extends Task
     {
       return false;
     }
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * @throws BuildException
-   */
-  private function logError()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   */
-  private function logInfo()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   */
-  private function logVerbose()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

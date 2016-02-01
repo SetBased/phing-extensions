@@ -1,9 +1,12 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
+require_once 'SetBasedTask.php';
+
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Phing task for reading a Semantic Version standard input.
  */
-class readSemanticVersionTask extends Task
+class readSemanticVersionTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -12,13 +15,6 @@ class readSemanticVersionTask extends Task
    * @var string
    */
   private $myFilename;
-
-  /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  private $myHaltOnError;
 
   /**
    * Name of variable in a build for major part of version number.
@@ -108,17 +104,6 @@ class readSemanticVersionTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Setter for XML attribute haltonerror.
-   *
-   * @param bool $theHaltOnError
-   */
-  public function setHaltOnError($theHaltOnError)
-  {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Setter for XML attribute majorProperty.
    *
    * @param string $theMajorVersion
@@ -181,40 +166,6 @@ class readSemanticVersionTask extends Task
   public function setVersionProperty($theVersion)
   {
     $this->myVersionProperty = $theVersion;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * @throws BuildException
-   */
-  private function logError()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   */
-  private function logInfo()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

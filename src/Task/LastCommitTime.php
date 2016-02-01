@@ -1,13 +1,21 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
-require_once 'MTime.php';
+require_once 'SetBasedTask.php';
 
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Phing task for set the mtime of (source) file to the latest commit in GIT.
  */
-class LastCommitTime extends MTime
+class LastCommitTimeTask extends SetBasedTask
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * The parent directory under which the mtime of (source) files must be set.
+   *
+   * @var string
+   */
+  protected $myWorkDirName;
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Array with last commit time for each file.
@@ -25,6 +33,17 @@ class LastCommitTime extends MTime
     $this->getLastCommitTime();
 
     $this->setFilesMtime();
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Setter for XML attribute dir.
+   *
+   * @param $theDir
+   */
+  public function setDir($theDir)
+  {
+    $this->myWorkDirName = $theDir;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -62,13 +81,13 @@ class LastCommitTime extends MTime
    */
   private function setFilesMtime()
   {
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myDir,
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myWorkDirName,
                                                                           FilesystemIterator::UNIX_PATHS));
     foreach ($files as $full_path => $file)
     {
       if ($file->isFile())
       {
-        $key = substr($full_path, strlen($this->myDir.'/'));
+        $key = substr($full_path, strlen($this->myWorkDirName.'/'));
         if (isset($this->myLastCommitTime[$key]))
         {
           $this->logVerbose("Set mtime of '%s' to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTime[$key]));

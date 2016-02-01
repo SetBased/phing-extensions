@@ -1,9 +1,12 @@
 <?php
 //----------------------------------------------------------------------------------------------------------------------
+require_once 'SetBasedTask.php';
+
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Phing task for removing recursively empty directories.
  */
-class removeEmptyDirsTask extends Task
+class removeEmptyDirsTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -18,14 +21,7 @@ class removeEmptyDirsTask extends Task
    *
    * @var string
    */
-  private $myDirName;
-
-  /**
-   * If set stop build on errors.
-   *
-   * @var bool
-   */
-  private $myHaltOnError = true;
+  private $myWorkDirName;
 
   /**
    * If set the parent directory must be removed too (if empty).
@@ -40,14 +36,14 @@ class removeEmptyDirsTask extends Task
    */
   public function main()
   {
-    $this->logInfo("Removing empty directories under '%s'.", $this->myDirName);
+    $this->logInfo("Removing empty directories under '%s'.", $this->myWorkDirName);
 
     $this->myCount = 0;
 
-    $empty = $this->removeEmptyDirs($this->myDirName);
+    $empty = $this->removeEmptyDirs($this->myWorkDirName);
     if ($empty)
     {
-      $this->removeDir($this->myDirName);
+      $this->removeDir($this->myWorkDirName);
     }
 
     $this->logInfo("Removed %d empty directories.", $this->myCount);
@@ -61,18 +57,7 @@ class removeEmptyDirsTask extends Task
    */
   public function setDir($theDirName)
   {
-    $this->myDirName = $theDirName;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Setter for XML attribute haltOnError.
-   *
-   * @param bool $theHaltOnError
-   */
-  public function setHaltOnError($theHaltOnError)
-  {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
+    $this->myWorkDirName = $theDirName;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -84,66 +69,6 @@ class removeEmptyDirsTask extends Task
   public function setRemoveParent($theRemoveParent)
   {
     $this->myRemoveParent = (boolean)$theRemoveParent;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Prints an error message and depending on HaltOnError throws an exception.
-   *
-   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
-   *
-   * @throws \BuildException
-   */
-  private function logError()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Prints an info message.
-   *
-   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
-   */
-  private function logInfo()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Prints a verbose level message.
-   *
-   * @param mixed ...$param The arguments as for [sprintf](http://php.net/manual/function.sprintf.php)
-   */
-  private function logVerbose()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
