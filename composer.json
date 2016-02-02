@@ -14,11 +14,14 @@
     {
       "name": "Valery Zuban",
       "role": "Developer"
+    },
+    {
+      "name": "Dima Nagorniy",
+      "role": "Developer"
     }
   ],
   "require": {
     "php": ">=5.3.0",
-    "packagist/yuicompressor-bin": "*",
     "phing/phing": "2.*"
   },
   "autoload": {
