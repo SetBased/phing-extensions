@@ -20,6 +20,7 @@ LastCommitTimeTask sets the modification time of files to the last commit time i
                              
 #### Example
 ```XML
+<taskdef name="LastCommitTimeTask" classname="vendor.setbased.phing-extensions.src.Task.LastCommitTimeTask"/>
 <LastCommitTimeTask dir="build"/>
 ```
 
@@ -41,6 +42,7 @@ under supplied properties for further usage in the Phing build script.
 | PreReleaseProperty | string | The name of the property for publishing the pre-release version (e.g. alpha.1).   |         | No       |                               
 #### Example
 ```XML
+<taskdef name="ReadSemanticVersion" classname="vendor.setbased.phing-extensions.src.Task.ReadSemanticVersionTask"/>
 <ReadSemanticVersion File=".version"  VersionProperty="VERSION"/>
 <echo message="${VERSION}"/>
 ```
@@ -57,6 +59,7 @@ RemoveEmptyDirectoriesTask removes recursively empty directories under a parent 
 
 #### Example
 ```XML
+<taskdef name="RemoveEmptyDirs" classname="vendor.setbased.phing-extensions.src.Task.RemoveEmptyDirsTask"/>
 <RemoveEmptyDirectoriesTask Dir="build/www/js"  RemoveParent="false"/>
 ```
 
@@ -72,6 +75,7 @@ entries.
 
 #### Example
 ```XML
+<taskdef name="SetDirectoryMTimeTask" classname="vendor.setbased.phing-extensions.src.Task.SetDirectoryMTimeTask"/>
 <SetDirectoryMTimeTask Dir="build"/>
 ```
 
