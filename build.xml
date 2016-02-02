@@ -37,9 +37,7 @@
     </target>
 
     <target name="version">
-        <readSemanticVersion file=".version"
-                             versionProperty="VERSION"
-                             haltOnError="true"/>
+        <readSemanticVersion file=".version"  versionProperty="VERSION"/>
         <echo message="${VERSION}"/>
         <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
         <gitpush repository="."/>
