@@ -1,6 +1,10 @@
 # Phing Extensions
 A set of Phing extensions.
 
+[![Latest Stable Version](https://poser.pugx.org/setbased/phing-extensions/v/stable)](https://packagist.org/packages/setbased/phing-extensions)
+[![Total Downloads](https://poser.pugx.org/setbased/phing-extensions/downloads)](https://packagist.org/packages/setbased/phing-extensions)
+[![License](https://poser.pugx.org/setbased/phing-extensions/license)](https://packagist.org/packages/setbased/phing-extensions)
+
 # Overview
 This collection of Phing extensions provides:
 
@@ -21,7 +25,7 @@ LastCommitTimeTask sets the modification time of files to the last commit time i
 #### Example
 ```XML
 <taskdef name="LastCommitTimeTask" classname="vendor.setbased.phing-extensions.src.Task.LastCommitTimeTask"/>
-<LastCommitTimeTask dir="build"/>
+<LastCommitTimeTask Dir="build"/>
 ```
 
 ## ReadSemanticVersionTask
