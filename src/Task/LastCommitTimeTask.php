@@ -75,7 +75,7 @@ class LastCommitTimeTask extends SetBasedTask
     $commit_date = '';
     foreach ($output as $line)
     {
-      if (strtotime($line)!==false)
+      if ((preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+\-]\d{4}$/', $line)))
       {
         $commit_date = strtotime($line);
         echo "$line\n";
