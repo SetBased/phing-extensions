@@ -6,7 +6,7 @@ require_once 'SetBasedTask.php';
 /**
  * Phing task for removing recursively empty directories.
  */
-class removeEmptyDirsTask extends SetBasedTask
+class RemoveEmptyDirsTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**

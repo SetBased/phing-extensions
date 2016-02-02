@@ -4,7 +4,7 @@ require_once 'SetBasedTask.php';
 
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Phing task for set the mtime of (source) file to the latest commit in GIT.
+ * Phing task for set the mtime of (source) file to the latest commit time in Git.
  */
 class LastCommitTimeTask extends SetBasedTask
 {
@@ -16,7 +16,6 @@ class LastCommitTimeTask extends SetBasedTask
    */
   protected $myWorkDirName;
 
-  //--------------------------------------------------------------------------------------------------------------------
   /**
    * Array with last commit time for each file.
    *
@@ -39,16 +38,16 @@ class LastCommitTimeTask extends SetBasedTask
   /**
    * Setter for XML attribute dir.
    *
-   * @param $theDir
+   * @param string $theWorkDirName The name of the working directory.
    */
-  public function setDir($theDir)
+  public function setDir($theWorkDirName)
   {
-    $this->myWorkDirName = $theDir;
+    $this->myWorkDirName = $theWorkDirName;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get last commit time of each file in the GIT repository.
+   * Get last commit time of each file in the Git repository.
    */
   private function getLastCommitTime()
   {
@@ -56,6 +55,8 @@ class LastCommitTimeTask extends SetBasedTask
     $command = 'git log --format=format:%ai --name-only';
     exec($command, $output, $return);
     if ($return!=0) $this->logError("Can not execute command '%s' in exec", $command);
+    print_r($output);
+    exit(0);
 
     // Find latest mtime for each file from $output
     $commit_date = '';

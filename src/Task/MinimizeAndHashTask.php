@@ -4,9 +4,9 @@ require_once 'SetBasedTask.php';
 
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Class minimizeAndHashTask
+ * Class MinimizeAndHashTask
  */
-class minimizeAndHashTask extends SetBasedTask
+class MinimizeAndHashTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**

@@ -4,9 +4,9 @@ require_once 'SetBasedTask.php';
 
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Phing task for reading a Semantic Version standard input.
+ * Phing task for reading a Semantic Version from the standard input.
  */
-class readSemanticVersionTask extends SetBasedTask
+class ReadSemanticVersionTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
