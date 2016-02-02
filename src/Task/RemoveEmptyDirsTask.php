@@ -17,18 +17,18 @@ class RemoveEmptyDirsTask extends SetBasedTask
   private $myCount;
 
   /**
-   * The parent directory under which all empty directories must be removed.
-   *
-   * @var string
-   */
-  private $myWorkDirName;
-
-  /**
    * If set the parent directory must be removed too (if empty).
    *
    * @var bool
    */
   private $myRemoveParent = false;
+
+  /**
+   * The parent directory under which all empty directories must be removed.
+   *
+   * @var string
+   */
+  private $myWorkDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -41,7 +41,7 @@ class RemoveEmptyDirsTask extends SetBasedTask
     $this->myCount = 0;
 
     $empty = $this->removeEmptyDirs($this->myWorkDirName);
-    if ($empty)
+    if ($empty && $this->myRemoveParent)
     {
       $this->removeDir($this->myWorkDirName);
     }
@@ -53,11 +53,11 @@ class RemoveEmptyDirsTask extends SetBasedTask
   /**
    * Setter for XML attribute dir.
    *
-   * @param string $theDirName
+   * @param string $theWorkDirName The name of the working directory.
    */
-  public function setDir($theDirName)
+  public function setDir($theWorkDirName)
   {
-    $this->myWorkDirName = $theDirName;
+    $this->myWorkDirName = $theWorkDirName;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

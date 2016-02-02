@@ -3,7 +3,7 @@
 /**
  * Parent Phing task with all general methods and properties.
  */
-class SetBasedTask extends Task
+abstract class SetBasedTask extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -12,22 +12,6 @@ class SetBasedTask extends Task
    * @var bool
    */
   protected $myHaltOnError = true;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   *  Called by the project to let the task do it's work. This method may be
-   *  called more than once, if the task is invoked more than once. For
-   *  example, if target1 and target2 both depend on target3, then running
-   *  <em>phing target1 target2</em> will run all tasks in target3 twice.
-   *
-   *  Should throw a BuildException if someting goes wrong with the build
-   *
-   *  This is here. Must be overloaded by real tasks.
-   */
-  public function main()
-  {
-    // TODO: Implement main() method.
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -42,6 +26,12 @@ class SetBasedTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * If $myHaltOnError is set throws a BuildException with, otherwise creates a log event with priority
+   * Project::MSG_ERR.
+   *
+   * @param mixed ...$param The format and arguments similar as for
+   *                        [sprintf](http://php.net/manual/function.sprintf.php)
+   *
    * @throws BuildException
    */
   protected function logError()
@@ -60,23 +50,10 @@ class SetBasedTask extends Task
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Print in console
-   */
-  protected function logVerbose()
-  {
-    $args   = func_get_args();
-    $format = array_shift($args);
-
-    foreach ($args as &$arg)
-    {
-      if (!is_scalar($arg)) $arg = var_export($arg, true);
-    }
-
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
+   * Creates a log event with priority Project::MSG_INFO.
+   *
+   * @param mixed ...$param The format and arguments similar as for
+   *                        [sprintf](http://php.net/manual/function.sprintf.php)
    */
   protected function logInfo()
   {
@@ -89,6 +66,27 @@ class SetBasedTask extends Task
     }
 
     $this->log(vsprintf($format, $args), Project::MSG_INFO);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Creates a log event with priority Project::MSG_VERBOSE.
+   *
+   * @param mixed ...$param The format and arguments similar as for
+   *                        [sprintf](http://php.net/manual/function.sprintf.php)   *
+   *
+   */
+  protected function logVerbose()
+  {
+    $args   = func_get_args();
+    $format = array_shift($args);
+
+    foreach ($args as &$arg)
+    {
+      if (!is_scalar($arg)) $arg = var_export($arg, true);
+    }
+
+    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
 

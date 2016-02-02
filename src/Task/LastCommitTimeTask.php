@@ -52,13 +52,15 @@ class LastCommitTimeTask extends SetBasedTask
   private function getLastCommitTime()
   {
     // Execute command for get list with file name and mtime from GIT log
-    $command = 'git log --format=format:%ai --name-only';
+    $command = "git log --format='format:%ai' --name-only";
     exec($command, $output, $return);
     if ($return!=0) $this->logError("Can not execute command '%s' in exec", $command);
-    print_r($output);
-    exit(0);
 
-    // Find latest mtime for each file from $output
+    // Find latest mtime for each file from $output.
+    // Note: Each line is either:
+    //       * an empty line
+    //       * a timestamp
+    //       * a filename.
     $commit_date = '';
     foreach ($output as $line)
     {
@@ -66,11 +68,12 @@ class LastCommitTimeTask extends SetBasedTask
       {
         $commit_date = strtotime($line);
       }
-      else
+      else if ($line!=='')
       {
-        if (!isset($this->myLastCommitTime[$line]) || $this->myLastCommitTime[$line]<$commit_date)
+        $file_name = $line;
+        if (!isset($this->myLastCommitTime[$file_name]) || $this->myLastCommitTime[$file_name]<$commit_date)
         {
-          $this->myLastCommitTime[$line] = $commit_date;
+          $this->myLastCommitTime[$file_name] = $commit_date;
         }
       }
     }

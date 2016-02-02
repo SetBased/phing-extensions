@@ -4,18 +4,17 @@ A set of Phing extensions.
 # Overview
 This collection of Phing extensions provides:
 
-	* minimizeAndHashTask
-	* readSemanticVersionTask
+	* ReadSemanticVersionTask
   
-## minimizeAndHashTask
-minimizeAndHashTask is a Phing extension that does basically three things:     
+## MinimizeAndHashTask
+MinimizeAndHashTask is a Phing extension that does basically three things:     
 
 	* Minimizing JavaScript and CSS files using YUI Compressor.
 	* Renaming the minimized files by adding the MD5 checksum into the file name.
 	* Updating each reference to JavaScript and CSS files in PHP (or any other) sources.
   	 
-## readSemanticVersionTask
-readSemanticVersionTask is a Phing extension that asks the user for [Semantic version](http://semver.org/) and validates 
+## ReadSemanticVersionTask
+ReadSemanticVersionTask is a Phing extension that asks the user for [Semantic version](http://semver.org/) and validates 
 the given input is a valid [Semantic version](http://semver.org/). The version number and its parts are available
 in variables for further usage in the Phing build script. 	    
 
@@ -25,7 +24,7 @@ We recommend to install setbased/phing via [Composer](https://getcomposer.org/):
 ```json
 {
 	"require-dev": {
-		"setbased/phing-extensions": "1.*"
+		"setbased/phing-extensions": "2.*"
 	}
 }
 ```

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Phing Extensions" default="build"  basedir=".">
-    <taskdef name="readSemanticVersion" classname="src.Task.readSemanticVersionTask"/>
+    <taskdef name="readSemanticVersion" classname="src.Task.ReadSemanticVersionTask"/>
     <property name="VERSION" value="0.0.0"/> <!-- Keep our IDE happy -->
 
     <target name="build"/>
