@@ -10,11 +10,11 @@ class LastCommitTimeTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The parent directory under which the mtime of (source) files must be set.
+   * The number of sources files found.
    *
-   * @var string
+   * @var int
    */
-  protected $myWorkDirName;
+  private $myCount = 0;
 
   /**
    * Array with last commit time for each file.
@@ -23,15 +23,26 @@ class LastCommitTimeTask extends SetBasedTask
    */
   private $myLastCommitTime = [];
 
+  /**
+   * The parent directory under which the mtime of (source) files must be set.
+   *
+   * @var string
+   */
+  private $myWorkDirName;
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
    */
   public function main()
   {
+    $this->logInfo("Preserving last commit time under directory %s", $this->myWorkDirName);
+
     $this->getLastCommitTime();
 
     $this->setFilesMtime();
+
+    $this->logInfo("Found %d files", $this->myCount);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -54,7 +65,7 @@ class LastCommitTimeTask extends SetBasedTask
     // Execute command for get list with file name and mtime from GIT log
     $command = "git log --format='format:%ai' --name-only";
     exec($command, $output, $return);
-    if ($return!=0) $this->logError("Can not execute command '%s' in exec", $command);
+    if ($return!=0) $this->logError("Can not execute command %s in exec", $command);
 
     // Find latest mtime for each file from $output.
     // Note: Each line is either:
@@ -67,6 +78,7 @@ class LastCommitTimeTask extends SetBasedTask
       if (strtotime($line)!==false)
       {
         $commit_date = strtotime($line);
+        echo "$line\n";
       }
       else if ($line!=='')
       {
@@ -94,12 +106,14 @@ class LastCommitTimeTask extends SetBasedTask
         $key = substr($full_path, strlen($this->myWorkDirName.'/'));
         if (isset($this->myLastCommitTime[$key]))
         {
-          $this->logVerbose("Set mtime of '%s' to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTime[$key]));
+          $this->logVerbose("Set mtime of %s to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTime[$key]));
           $success = touch($full_path, $this->myLastCommitTime[$key]);
           if (!$success)
           {
-            $this->logError("Unable to set mtime of file '%s'.", $full_path);
+            $this->logError("Unable to set mtime of file %s", $full_path);
           }
+
+          $this->myCount++;
         }
       }
     }
@@ -109,4 +123,3 @@ class LastCommitTimeTask extends SetBasedTask
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

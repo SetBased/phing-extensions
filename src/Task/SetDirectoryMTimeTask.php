@@ -10,11 +10,18 @@ class SetDirectoryMTimeTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * The number of su-directories found.
+   *
+   * @var int
+   */
+  private $myCount = 0;
+
+  /**
    * The parent directory under which the mtime of (source) files must be set.
    *
    * @var string
    */
-  protected $myWorkDirName;
+  private $myWorkDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -22,6 +29,8 @@ class SetDirectoryMTimeTask extends SetBasedTask
    */
   public function main()
   {
+    $this->logInfo("Setting mtime recursively under directory %s", $this->myWorkDirName);
+
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myWorkDirName,
                                                                             FilesystemIterator::SKIP_DOTS),
                                              RecursiveIteratorIterator::CHILD_FIRST);
@@ -33,15 +42,19 @@ class SetDirectoryMTimeTask extends SetBasedTask
         $mtime = $this->getMaxMTime($path);
         if (isset($mtime))
         {
-          $this->logVerbose("Set mtime of '%s' to '%s'.", $path, date('Y-m-d H:i:s', $mtime));
+          $this->logVerbose("Set mtime of %s to %s", $path, date('Y-m-d H:i:s', $mtime));
           $success = touch($path, $mtime);
           if (!$success)
           {
-            $this->logError("Unable to set mtime of '%s'.", $path);
+            $this->logError("Unable to set mtime of %s", $path);
           }
+
+          $this->myCount++;
         }
       }
     }
+
+    $this->logInfo("Found %d sub-directories", $this->myCount);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,4 +95,3 @@ class SetDirectoryMTimeTask extends SetBasedTask
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

@@ -181,7 +181,7 @@ class ReadSemanticVersionTask extends SetBasedTask
         $content = file_get_contents($this->myFilename);
         if ($content===false)
         {
-          $this->logError("Not readable file '%s'.", $this->myFilename);
+          $this->logError("Not readable file %s.", $this->myFilename);
         }
 
         if ($content)
@@ -189,18 +189,17 @@ class ReadSemanticVersionTask extends SetBasedTask
           $this->myPreviousVersion = $this->validateSemanticVersion($content);
           if ($this->myPreviousVersion)
           {
-            $this->logInfo("Current version is '%s'.", $this->myPreviousVersion['version']);
+            $this->logInfo("Current version is %s", $this->myPreviousVersion['version']);
           }
           else
           {
-            $this->logError("Version is '%s' is not a valid Semantic Version.",
-                            $this->myPreviousVersion['version']);
+            $this->logError("Version is %s is not a valid Semantic Version", $this->myPreviousVersion['version']);
           }
         }
       }
       else
       {
-        $this->logInfo("File '%s' does not exist.", $this->myFilename);
+        $this->logInfo("File %s does not exist", $this->myFilename);
       }
     }
   }
@@ -222,7 +221,7 @@ class ReadSemanticVersionTask extends SetBasedTask
 
       if (!$valid)
       {
-        $this->logInfo("'%s' is not a valid Semantic Version.", trim($line, "\n"));
+        $this->logInfo("%s is not a valid Semantic Version", trim($line, "\n"));
       }
     }
   }
@@ -273,7 +272,7 @@ class ReadSemanticVersionTask extends SetBasedTask
       $status = file_put_contents($this->myFilename, $this->myNewVersion['version']);
       if (!$status)
       {
-        $this->logError("File '%s' is not writable.", $this->myFilename);
+        $this->logError("File %s is not writable", $this->myFilename);
       }
     }
   }
