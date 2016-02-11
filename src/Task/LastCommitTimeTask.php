@@ -63,9 +63,13 @@ class LastCommitTimeTask extends SetBasedTask
   private function getLastCommitTime()
   {
     // Execute command for get list with file name and mtime from GIT log
-    $command = "git log --format='format:%ai' --name-only";
-    exec($command, $output, $return);
-    if ($return!=0) $this->logError("Can not execute command %s in exec", $command);
+    $command_log = "git log --format='format:%ai' --name-only";
+    exec($command_log, $output_log, $return_log);
+    if ($return_log!=0) $this->logError("Can not execute command %s in exec", $command_log);
+
+    $command_list = "git ls-files";
+    exec($command_list, $output_list, $return_list);
+    if ($return_list!=0) $this->logError("Can not execute command %s in exec", $command_list);
 
     // Find latest mtime for each file from $output.
     // Note: Each line is either:
@@ -73,7 +77,7 @@ class LastCommitTimeTask extends SetBasedTask
     //       * a timestamp
     //       * a filename.
     $commit_date = '';
-    foreach ($output as $line)
+    foreach ($output_log as $line)
     {
       if ((preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+\-]\d{4}$/', $line)))
       {
@@ -82,9 +86,16 @@ class LastCommitTimeTask extends SetBasedTask
       else if ($line!=='')
       {
         $file_name = $line;
-        if (!isset($this->myLastCommitTime[$file_name]) || $this->myLastCommitTime[$file_name]<$commit_date)
+        if (in_array($file_name, $output_list))
         {
-          $this->myLastCommitTime[$file_name] = $commit_date;
+          if (!isset($this->myLastCommitTime[$file_name]) || $this->myLastCommitTime[$file_name]<$commit_date)
+          {
+            $this->myLastCommitTime[$file_name] = $commit_date;
+          }
+        }
+        else
+        {
+          $this->myLastCommitTime[$file_name] = null;
         }
       }
     }
