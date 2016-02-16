@@ -21,7 +21,7 @@ class LastCommitTimeTask extends SetBasedTask
    *
    * @var array
    */
-  private $myLastCommitTime = [];
+  private $myLastCommitTimes = [];
 
   /**
    * The parent directory under which the mtime of (source) files must be set.
@@ -38,7 +38,9 @@ class LastCommitTimeTask extends SetBasedTask
   {
     $this->logInfo("Preserving last commit time under directory %s", $this->myWorkDirName);
 
-    $this->getLastCommitTime();
+    $this->fetchAllFilesUnderGit();
+
+    $this->fetchLastCommitTimes();
 
     $this->setFilesMtime();
 
@@ -58,18 +60,30 @@ class LastCommitTimeTask extends SetBasedTask
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get last commit time of each file in the Git repository.
+   * Fetches all files that are currently under git.
    */
-  private function getLastCommitTime()
+  private function fetchAllFilesUnderGit()
+  {
+    $command = "git ls-files";
+    exec($command, $output, $return);
+    if ($return!=0) $this->logError("Can not execute command %s in exec", $command);
+
+    foreach ($output as $filename)
+    {
+      $this->myLastCommitTimes[$filename] = 0;
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Fetches last commit time of each file in the Git repository.
+   */
+  private function fetchLastCommitTimes()
   {
     // Execute command for get list with file name and mtime from GIT log
-    $command_log = "git log --format='format:%ai' --name-only";
-    exec($command_log, $output_log, $return_log);
-    if ($return_log!=0) $this->logError("Can not execute command %s in exec", $command_log);
-
-    $command_list = "git ls-files";
-    exec($command_list, $output_list, $return_list);
-    if ($return_list!=0) $this->logError("Can not execute command %s in exec", $command_list);
+    $command = "git log --format='format:%ai' --name-only";
+    exec($command, $output, $return);
+    if ($return!=0) $this->logError("Can not execute command %s in exec", $command);
 
     // Find latest mtime for each file from $output.
     // Note: Each line is either:
@@ -77,7 +91,7 @@ class LastCommitTimeTask extends SetBasedTask
     //       * a timestamp
     //       * a filename.
     $commit_date = '';
-    foreach ($output_log as $line)
+    foreach ($output as $line)
     {
       if ((preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+\-]\d{4}$/', $line)))
       {
@@ -85,17 +99,10 @@ class LastCommitTimeTask extends SetBasedTask
       }
       else if ($line!=='')
       {
-        $file_name = $line;
-        if (in_array($file_name, $output_list))
+        $filename = $line;
+        if (isset($this->myLastCommitTimes[$filename]) && $this->myLastCommitTimes[$filename]<$commit_date)
         {
-          if (!isset($this->myLastCommitTime[$file_name]) || $this->myLastCommitTime[$file_name]<$commit_date)
-          {
-            $this->myLastCommitTime[$file_name] = $commit_date;
-          }
-        }
-        else
-        {
-          $this->myLastCommitTime[$file_name] = null;
+          $this->myLastCommitTimes[$filename] = $commit_date;
         }
       }
     }
@@ -114,10 +121,10 @@ class LastCommitTimeTask extends SetBasedTask
       if ($file->isFile())
       {
         $key = substr($full_path, strlen($this->myWorkDirName.'/'));
-        if (isset($this->myLastCommitTime[$key]))
+        if (isset($this->myLastCommitTimes[$key]))
         {
-          $this->logVerbose("Set mtime of %s to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTime[$key]));
-          $success = touch($full_path, $this->myLastCommitTime[$key]);
+          $this->logVerbose("Set mtime of %s to %s", $full_path, date('Y-m-d H:i:s', $this->myLastCommitTimes[$key]));
+          $success = touch($full_path, $this->myLastCommitTimes[$key]);
           if (!$success)
           {
             $this->logError("Unable to set mtime of file %s", $full_path);

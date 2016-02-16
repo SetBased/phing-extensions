@@ -6,17 +6,22 @@
   "license": "MIT",
   "authors": [
     {
+      "name": "Set Based IT Consultancy",
+      "email": "info@setbased.nl",
+      "homepage": "http://www.setbased.nl"
+    },
+    {
       "name": "Paul Water",
       "email": "p.r.water@setbased.nl",
       "homepage": "http://www.setbased.nl",
       "role": "Architect"
     },
     {
-      "name": "Valery Zuban",
+      "name": "Dima Nagorniy",
       "role": "Developer"
     },
     {
-      "name": "Dima Nagorniy",
+      "name": "Valery Zuban",
       "role": "Developer"
     }
   ],
