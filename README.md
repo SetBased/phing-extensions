@@ -1,9 +1,11 @@
 # Phing Extensions
 A set of Phing extensions.
 
-[![Latest Stable Version](https://poser.pugx.org/setbased/phing-extensions/v/stable)](https://packagist.org/packages/setbased/phing-extensions)
-[![Total Downloads](https://poser.pugx.org/setbased/phing-extensions/downloads)](https://packagist.org/packages/setbased/phing-extensions)
+[![Gitter](https://badges.gitter.im/SetBased/phing-extensions.svg)](https://gitter.im/SetBased/phing-extensions?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![License](https://poser.pugx.org/setbased/phing-extensions/license)](https://packagist.org/packages/setbased/phing-extensions)
+[![Latest Stable Version](https://poser.pugx.org/setbased/phing-extensions/v/stable)](https://packagist.org/packages/setbased/phing-extensions)
+[![Dependency Status](https://www.versioneye.com/user/projects/56e2ea7ddf573d00472cd2ba/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56e2ea7ddf573d00472cd2ba)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/SetBased/phing-extensions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/SetBased/phing-extensions/?branch=master)
 
 # Overview
 This collection of Phing extensions provides:
