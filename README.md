@@ -6,6 +6,7 @@ A set of Phing extensions.
 [![Latest Stable Version](https://poser.pugx.org/setbased/phing-extensions/v/stable)](https://packagist.org/packages/setbased/phing-extensions)
 [![Dependency Status](https://www.versioneye.com/user/projects/56e2ea7ddf573d00472cd2ba/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56e2ea7ddf573d00472cd2ba)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/SetBased/phing-extensions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/SetBased/phing-extensions/?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/042cbf1dbaca4373a0b9aa6ebba3a2dd)](https://www.codacy.com/app/p-r-water/phing-extensions)
 
 # Overview
 This collection of Phing extensions provides:
