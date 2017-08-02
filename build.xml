@@ -1,47 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Phing Extensions" default="build"  basedir=".">
-    <taskdef name="ReadSemanticVersion" classname="src.Task.ReadSemanticVersionTask"/>
-    <property name="VERSION" value="0.0.0"/> <!-- Keep our IDE happy -->
-
     <target name="build"/>
 
-    <!-- Merges the current branch with a remote branch -->
-    <target name="git-merge">
-        <exec command="git rev-parse --abbrev-ref HEAD" outputProperty="CURRENT_BRANCH"/>
-        <input message="Your current branch is '${CURRENT_BRANCH}'. Remote branch: " propertyName="BRANCH"/>
-        <gitbranch branchname="temp" repository="."/>
-        <gitcheckout repository="." branchname="temp"/>
-        <gitpull repository="." refspec="${BRANCH}" quiet="false"/>
-        <gitcheckout repository="." branchname="${CURRENT_BRANCH}"/>
-        <gitmerge repository="." remote="temp"/>
-        <gitbranch branchname="temp" repository="." delete="true"/>
-    </target>
-
-    <!-- Merges the current branch with a remote branch in two steps: step 1 -->
-    <target name="git-merge1">
-        <exec command="git rev-parse --abbrev-ref HEAD" outputProperty="CURRENT_BRANCH" checkreturn="true"/>
-        <exec command="git fetch -p" passthru="true" checkreturn="true"/>
-        <input message="Your current branch is '${CURRENT_BRANCH}'. Remote branch: " propertyName="BRANCH"/>
-        <gitbranch branchname="temp" repository="."/>
-        <gitcheckout repository="." branchname="temp"/>
-        <gitpull repository="." refspec="${BRANCH}" quiet="false"/>
-    </target>
-
-    <!-- Merges the current branch with a remote branch in two steps: step 2 -->
-    <target name="git-merge2">
-        <exec command="git rev-parse --abbrev-ref HEAD" outputProperty="CURRENT_BRANCH" checkreturn="true"/>
-        <input message="Your current branch is '${CURRENT_BRANCH}'. Branch: " propertyName="BRANCH"/>
-        <gitcheckout repository="." branchname="${BRANCH}"/>
-        <gitmerge repository="." remote="temp"/>
-        <gitbranch branchname="temp" repository="." delete="true"/>
-    </target>
-
-    <target name="version">
-        <ReadSemanticVersion file=".version"  versionProperty="VERSION"/>
-        <echo message="${VERSION}"/>
-        <gitcommit repository="." message="Release: ${VERSION}" allFiles="true"/>
-        <gitpush repository="."/>
-        <gittag repository="." name="${VERSION}"/>
-        <gitpush repository="." refspec="${VERSION}" quiet="false"/>
+    <!-- Run composer update -->
+    <target name="update">
+        <exec command="composer update" checkreturn="true" passthru="true"/>
     </target>
 </project>
