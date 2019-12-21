@@ -1,19 +1,22 @@
 {
   "name": "setbased/phing-extensions",
-  "description": "A collection of Phing extensions.",
-  "type": "library",
-  "keyword": ["Phing", "Extensions"],
+  "description": "A collection of Phing extensions",
+  "keywords": [
+    "Phing",
+    "Extensions"
+  ],
   "license": "MIT",
   "require": {
-    "php": ">=7.0.0",
-    "phing/phing": "^2.0.0"
+    "php": ">=7.1.0",
+    "phing/phing": "3.0.x-dev",
+    "setbased/helper-program-execution": "^1.0"
   },
   "autoload": {
     "psr-4": {
-      "SetBased\\Phing\\": "src/"
+      "SetBased\\Phing\\Task\\": "src/"
     }
   },
   "config": {
-    "bin-dir": "bin"
+    "bin-dir": "bin/"
   }
 }

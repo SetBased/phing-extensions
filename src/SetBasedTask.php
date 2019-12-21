@@ -1,9 +1,12 @@
 <?php
-//----------------------------------------------------------------------------------------------------------------------
+declare(strict_types=1);
+
+namespace SetBased\Phing\Task;
+
 /**
  * Parent Phing task with all general methods and properties.
  */
-abstract class SetBasedTask extends Task
+abstract class SetBasedTask extends \Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -11,17 +14,17 @@ abstract class SetBasedTask extends Task
    *
    * @var bool
    */
-  protected $myHaltOnError = true;
+  protected $haltOnError = true;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute haltOnError.
    *
-   * @param $theHaltOnError
+   * @param bool $haltOnError If set stop build on errors.
    */
-  public function setHaltOnError($theHaltOnError)
+  public function setHaltOnError(bool $haltOnError): void
   {
-    $this->myHaltOnError = (boolean)$theHaltOnError;
+    $this->haltOnError = $haltOnError;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -32,9 +35,9 @@ abstract class SetBasedTask extends Task
    * @param mixed ...$param The format and arguments similar as for
    *                        [sprintf](http://php.net/manual/function.sprintf.php)
    *
-   * @throws BuildException
+   * @throws \BuildException
    */
-  protected function logError()
+  protected function logError(): void
   {
     $args   = func_get_args();
     $format = array_shift($args);
@@ -44,8 +47,8 @@ abstract class SetBasedTask extends Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    if ($this->myHaltOnError) throw new BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
+    if ($this->haltOnError) throw new \BuildException(vsprintf($format, $args));
+    else $this->log(vsprintf($format, $args), \Project::MSG_ERR);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -55,7 +58,7 @@ abstract class SetBasedTask extends Task
    * @param mixed ...$param The format and arguments similar as for
    *                        [sprintf](http://php.net/manual/function.sprintf.php)
    */
-  protected function logInfo()
+  protected function logInfo(): void
   {
     $args   = func_get_args();
     $format = array_shift($args);
@@ -65,7 +68,7 @@ abstract class SetBasedTask extends Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log(vsprintf($format, $args), Project::MSG_INFO);
+    $this->log(vsprintf($format, $args), \Project::MSG_INFO);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,7 +79,7 @@ abstract class SetBasedTask extends Task
    *                        [sprintf](http://php.net/manual/function.sprintf.php)   *
    *
    */
-  protected function logVerbose()
+  protected function logVerbose(): void
   {
     $args   = func_get_args();
     $format = array_shift($args);
@@ -86,11 +89,10 @@ abstract class SetBasedTask extends Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
+    $this->log(vsprintf($format, $args), \Project::MSG_VERBOSE);
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
 }
 
-//--------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

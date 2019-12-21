@@ -1,8 +1,8 @@
 <?php
-//----------------------------------------------------------------------------------------------------------------------
-require_once 'SetBasedTask.php';
+declare(strict_types=1);
 
-//----------------------------------------------------------------------------------------------------------------------
+namespace SetBased\Phing\Task;
+
 /**
  * Phing task for setting recursively the mtime of a directories to the max mtime of its entries.
  */
@@ -14,14 +14,14 @@ class SetDirectoryMTimeTask extends SetBasedTask
    *
    * @var int
    */
-  private $myCount = 0;
+  private $count = 0;
 
   /**
    * The parent directory under which the mtime of (source) files must be set.
    *
    * @var string
    */
-  private $myWorkDirName;
+  private $workDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -29,18 +29,18 @@ class SetDirectoryMTimeTask extends SetBasedTask
    */
   public function main()
   {
-    $this->logInfo("Setting mtime recursively under directory %s", $this->myWorkDirName);
+    $this->logInfo("Setting mtime recursively under directory %s", $this->workDirName);
 
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->myWorkDirName,
-                                                                            FilesystemIterator::SKIP_DOTS),
-                                             RecursiveIteratorIterator::CHILD_FIRST);
+    $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->workDirName,
+                                                                               \FilesystemIterator::SKIP_DOTS),
+                                               \RecursiveIteratorIterator::CHILD_FIRST);
 
     foreach ($iterator as $path => $file_info)
     {
       if ($file_info->isDir())
       {
         $mtime = $this->getMaxMTime($path);
-        if (isset($mtime))
+        if ($mtime!==null)
         {
           $this->logVerbose("Set mtime of %s to %s", $path, date('Y-m-d H:i:s', $mtime));
           $success = touch($path, $mtime);
@@ -49,38 +49,38 @@ class SetDirectoryMTimeTask extends SetBasedTask
             $this->logError("Unable to set mtime of %s", $path);
           }
 
-          $this->myCount++;
+          $this->count++;
         }
       }
     }
 
-    $this->logInfo("Found %d sub-directories", $this->myCount);
+    $this->logInfo("Found %d sub-directories", $this->count);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute dir.
    *
-   * @param string $theWorkDirName The name of the working directory.
+   * @param string $workDirName The name of the working directory.
    */
-  public function setDir($theWorkDirName)
+  public function setDir(string $workDirName): void
   {
-    $this->myWorkDirName = $theWorkDirName;
+    $this->workDirName = $workDirName;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Get max mtime from all files in directory.
    *
-   * @param string $theDirName The name of the directory.
+   * @param string $dirName The name of the directory.
    *
-   * @return int
+   * @return int|null
    */
-  private function getMaxMTime($theDirName)
+  private function getMaxMTime(string $dirName): ?int
   {
-    $iterator = new RecursiveIteratorIterator(
-      new RecursiveDirectoryIterator($theDirName, FilesystemIterator::SKIP_DOTS),
-      RecursiveIteratorIterator::SELF_FIRST);
+    $iterator = new \RecursiveIteratorIterator(
+      new \RecursiveDirectoryIterator($dirName, \FilesystemIterator::SKIP_DOTS),
+      \RecursiveIteratorIterator::SELF_FIRST);
 
     $mtime = null;
     foreach ($iterator as $file_info)

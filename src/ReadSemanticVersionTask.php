@@ -1,8 +1,8 @@
 <?php
-//----------------------------------------------------------------------------------------------------------------------
-require_once 'SetBasedTask.php';
+declare(strict_types=1);
 
-//----------------------------------------------------------------------------------------------------------------------
+namespace SetBased\Phing\Task;
+
 /**
  * Phing task for reading a Semantic Version from the standard input.
  */
@@ -14,63 +14,63 @@ class ReadSemanticVersionTask extends SetBasedTask
    *
    * @var string
    */
-  private $myFilename;
+  private $filename;
 
   /**
    * Name of variable in a build for major part of version number.
    *
    * @var string
    */
-  private $myMajorProperty;
+  private $majorProperty;
 
   /**
    * Name of variable in a build for minor part of version number.
    *
    * @var string
    */
-  private $myMinorProperty;
+  private $minorProperty;
 
   /**
    * Array with parts of new version number.
    *
    * @var array
    */
-  private $myNewVersion = [];
+  private $newVersion = [];
 
   /**
    * Name of variable in a build for patch part of version number.
    *
    * @var string
    */
-  private $myPatchProperty;
+  private $patchVersion;
 
   /**
    * Name of variable in a build for pre-release part of version number (i.e. the part after - (if any)).
    *
    * @var string
    */
-  private $myPreReleaseProperty;
+  private $preReleaseVersion;
 
   /**
    * Array with parts of previous version number.
    *
    * @var array
    */
-  private $myPreviousVersion = [];
+  private $previousVersion = [];
 
   /**
    * Name of variable in a build for release part of version number (i.e. MAJOR.MINOR.PATCH).
    *
    * @var string
    */
-  private $myReleaseProperty;
+  private $releaseVersion;
 
   /**
    * Name of variable in a build for full version number.
    *
    * @var string
    */
-  private $myVersionProperty;
+  private $versionProperty;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -95,111 +95,113 @@ class ReadSemanticVersionTask extends SetBasedTask
   /**
    * Setter for XML attribute file.
    *
-   * @param string $theFile
+   * @param string $filename The filename with contain semantic version number.
    */
-  public function setFile($theFile)
+  public function setFile(string $filename): void
   {
-    $this->myFilename = $theFile;
+    $this->filename = $filename;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute majorProperty.
    *
-   * @param string $theMajorVersion
+   * @param string $majorVersion Name of variable in a build for major part of version number.
    */
-  public function setMajorProperty($theMajorVersion)
+  public function setMajorProperty(string $majorVersion): void
   {
-    $this->myMajorProperty = $theMajorVersion;
+    $this->majorProperty = $majorVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute minorProperty.
    *
-   * @param string $theMinorVersion
+   * @param string $minorVersion Name of variable in a build for minor part of version number.
    */
-  public function setMinorProperty($theMinorVersion)
+  public function setMinorProperty(string $minorVersion): void
   {
-    $this->myMinorProperty = $theMinorVersion;
+    $this->minorProperty = $minorVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute patchProperty.
    *
-   * @param string $thePatchVersion
+   * @param string $patchVersion Name of variable in a build for patch part of version number.
    */
-  public function setPatchProperty($thePatchVersion)
+  public function setPatchProperty(string $patchVersion): void
   {
-    $this->myPatchProperty = $thePatchVersion;
+    $this->patchVersion = $patchVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute preReleaseProperty.
    *
-   * @param string $thePreReleaseVersion
+   * @param string $preReleaseVersion Name of variable in a build for pre-release part of version number (i.e. the part
+   *                                  after - (if any)).
    */
-  public function setPreReleaseProperty($thePreReleaseVersion)
+  public function setPreReleaseProperty(string $preReleaseVersion): void
   {
-    $this->myPreReleaseProperty = $thePreReleaseVersion;
+    $this->preReleaseVersion = $preReleaseVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute releaseProperty.
    *
-   * @param string $theReleaseVersion
+   * @param string $releaseVersion Name of variable in a build for release part of version number (i.e.
+   *                               MAJOR.MINOR.PATCH).
    */
-  public function setReleaseProperty($theReleaseVersion)
+  public function setReleaseProperty(string $releaseVersion): void
   {
-    $this->myReleaseProperty = $theReleaseVersion;
+    $this->releaseVersion = $releaseVersion;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Setter for XML attribute versionProperty.
    *
-   * @param string $theVersion
+   * @param string $versionProperty Name of variable in a build for full version number.
    */
-  public function setVersionProperty($theVersion)
+  public function setVersionProperty(string $versionProperty): void
   {
-    $this->myVersionProperty = $theVersion;
+    $this->versionProperty = $versionProperty;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Reads previous version from file if filename is set.
    */
-  private function readPreviousVersionNumber()
+  private function readPreviousVersionNumber(): void
   {
-    if ($this->myFilename)
+    if ($this->filename)
     {
-      if (is_file($this->myFilename))
+      if (is_file($this->filename))
       {
-        $content = file_get_contents($this->myFilename);
+        $content = file_get_contents($this->filename);
         if ($content===false)
         {
-          $this->logError("Not readable file %s.", $this->myFilename);
+          $this->logError("Not readable file %s.", $this->filename);
         }
 
         if ($content)
         {
-          $this->myPreviousVersion = $this->validateSemanticVersion($content);
-          if ($this->myPreviousVersion)
+          $this->previousVersion = $this->validateSemanticVersion($content);
+          if ($this->previousVersion)
           {
-            $this->logInfo("Current version is %s", $this->myPreviousVersion['version']);
+            $this->logInfo("Current version is %s", $this->previousVersion['version']);
           }
           else
           {
-            $this->logError("Version is %s is not a valid Semantic Version", $this->myPreviousVersion['version']);
+            $this->logError("Version is %s is not a valid Semantic Version", $this->previousVersion['version']);
           }
         }
       }
       else
       {
-        $this->logInfo("File %s does not exist", $this->myFilename);
+        $this->logInfo("File %s does not exist", $this->filename);
       }
     }
   }
@@ -208,16 +210,16 @@ class ReadSemanticVersionTask extends SetBasedTask
   /**
    * Read new version number from php://stdin stream i.e CLI.
    */
-  private function setNewVersionNumber()
+  private function setNewVersionNumber(): void
   {
     $valid = false;
     while (!$valid)
     {
       echo "Enter new Semantic Version: ";
 
-      $line               = fgets(STDIN);
-      $this->myNewVersion = $this->validateSemanticVersion($line);
-      $valid              = ($this->myNewVersion);
+      $line             = fgets(STDIN);
+      $this->newVersion = $this->validateSemanticVersion($line);
+      $valid            = ($this->newVersion);
 
       if (!$valid)
       {
@@ -230,34 +232,33 @@ class ReadSemanticVersionTask extends SetBasedTask
   /**
    * Adds new properties to phing project with data about version number.
    */
-  private function setProjectVersionProperties()
+  private function setProjectVersionProperties(): void
   {
-    if ($this->myVersionProperty)
+    if ($this->versionProperty)
     {
-      $this->project->setProperty($this->myVersionProperty, $this->myNewVersion['version']);
+      $this->project->setProperty($this->versionProperty, $this->newVersion['version']);
     }
 
-    if ($this->myReleaseProperty)
+    if ($this->releaseVersion)
     {
-      $this->project->setProperty($this->myReleaseProperty, $this->myNewVersion['release']);
+      $this->project->setProperty($this->releaseVersion, $this->newVersion['release']);
     }
-    if ($this->myPreReleaseProperty)
+    if ($this->preReleaseVersion)
     {
-      $this->project->setProperty($this->myPreReleaseProperty, $this->myNewVersion['pre-release']);
+      $this->project->setProperty($this->preReleaseVersion, $this->newVersion['pre-release']);
     }
 
-
-    if ($this->myMajorProperty)
+    if ($this->majorProperty)
     {
-      $this->project->setProperty($this->myMajorProperty, $this->myNewVersion['major']);
+      $this->project->setProperty($this->majorProperty, $this->newVersion['major']);
     }
-    if ($this->myMinorProperty)
+    if ($this->minorProperty)
     {
-      $this->project->setProperty($this->myMinorProperty, $this->myNewVersion['minor']);
+      $this->project->setProperty($this->minorProperty, $this->newVersion['minor']);
     }
-    if ($this->myPatchProperty)
+    if ($this->patchVersion)
     {
-      $this->project->setProperty($this->myPatchProperty, $this->myNewVersion['patch']);
+      $this->project->setProperty($this->patchVersion, $this->newVersion['patch']);
     }
   }
 
@@ -265,14 +266,14 @@ class ReadSemanticVersionTask extends SetBasedTask
   /**
    * Writes new version number into file if the filename is set.
    */
-  private function updateVersionInFile()
+  private function updateVersionInFile(): void
   {
-    if ($this->myFilename)
+    if ($this->filename)
     {
-      $status = file_put_contents($this->myFilename, $this->myNewVersion['version']);
+      $status = file_put_contents($this->filename, $this->newVersion['version']);
       if (!$status)
       {
-        $this->logError("File %s is not writable", $this->myFilename);
+        $this->logError("File %s is not writable", $this->filename);
       }
     }
   }
@@ -282,11 +283,11 @@ class ReadSemanticVersionTask extends SetBasedTask
    * Validates a string is a valid Semantic Version. If the string is semantic version returns an array with the parts
    * of the semantic version. Otherwise returns null.
    *
-   * @param string $theVersion The string the be validated.
+   * @param string $version The string the be validated.
    *
    * @return array
    */
-  private function validateSemanticVersion($theVersion)
+  private function validateSemanticVersion(string $version): array
   {
     /**
      * Notice:
@@ -295,34 +296,33 @@ class ReadSemanticVersionTask extends SetBasedTask
      * Valid version numbers: 1, 1.2, 2.2.3, 1.2.6-alpha, 4.2.3-alpha.beta, 1.5.0-rc.1;
      * Invalid version numbers: 1., 1.2., 1beta, 4.5alpha, 1.2.3-rc_1;
      */
-    $status = preg_match('/^(\d+)(?:\.(\d+))?(?:\.((\d+)(?:-([A-Za-z]+)(?:\.(\w+))?)?))?$/', $theVersion, $matches);
+    $status = preg_match('/^(\d+)(?:\.(\d+))?(?:\.((\d+)(?:-([A-Za-z]+)(?:\.(\w+))?)?))?$/', $version, $matches);
 
-    $version = [];
-
+    $parts = [];
     if ($status)
     {
-      $version['version'] = $matches[0];
-      $version['major']   = $matches[1];
-      $version['minor']   = $matches[2];
+      $parts['version'] = $matches[0];
+      $parts['major']   = $matches[1];
+      $parts['minor']   = $matches[2];
 
       // The above regexp will put the pre-release part in the patch part. Separate patch and pre-release part using
       // ordinary string manipulation.
       $pos = strpos($matches[3], '-');
       if ($pos!==false)
       {
-        $version['patch']       = substr($matches[3], 0, $pos);
-        $version['pre-release'] = substr($matches[3], $pos + 1);
+        $parts['patch']       = substr($matches[3], 0, $pos);
+        $parts['pre-release'] = substr($matches[3], $pos + 1);
       }
       else
       {
-        $version['patch']       = $matches[3];
-        $version['pre-release'] = '';
+        $parts['patch']       = $matches[3];
+        $parts['pre-release'] = '';
       }
 
-      $version['release'] = $version['major'].'.'.$version['minor'].'.'.$version['patch'];
+      $parts['release'] = $parts['major'].'.'.$parts['minor'].'.'.$parts['patch'];
     }
 
-    return $version;
+    return $parts;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
