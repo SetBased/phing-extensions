@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Phing\Task;
-
 /**
  * Parent Phing task with all general methods and properties.
  */

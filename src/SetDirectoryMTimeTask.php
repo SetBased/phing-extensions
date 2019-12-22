@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Phing\Task;
-
 /**
  * Phing task for setting recursively the mtime of a directories to the max mtime of its entries.
  */

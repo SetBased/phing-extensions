@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace SetBased\Phing\Task;
-
 /**
  * Phing task for reading a Semantic Version from the standard input.
  */

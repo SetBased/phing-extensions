@@ -12,9 +12,7 @@
     "setbased/helper-program-execution": "^1.0"
   },
   "autoload": {
-    "psr-4": {
-      "SetBased\\Phing\\Task\\": "src/"
-    }
+    "classmap": ["src"]
   },
   "config": {
     "bin-dir": "bin/"
