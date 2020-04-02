@@ -1,5 +1,6 @@
-.idea
-bin/phing
-bin/yuicompressor.jar
-composer.lock
-vendor
+/.idea
+/bin/phing
+/composer.lock
+/custom.task.properties
+/custom.type.properties
+/vendor

@@ -6,4 +6,8 @@
     <target name="update">
         <exec command="composer update" checkreturn="true" passthru="true"/>
     </target>
+
+    <!-- Runs all unit tests -->
+    <target name="unit">
+    </target>
 </project>

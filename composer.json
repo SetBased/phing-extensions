@@ -7,14 +7,17 @@
   ],
   "license": "MIT",
   "require": {
-    "php": ">=7.1.0",
+    "php": ">=7.3",
     "phing/phing": "3.0.x-dev",
     "setbased/helper-program-execution": "^1.0"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "autoload": {
     "classmap": ["src"]
   },
   "config": {
-    "bin-dir": "bin/"
+    "bin-dir": "bin/",
+    "sort-packages": true
   }
 }
