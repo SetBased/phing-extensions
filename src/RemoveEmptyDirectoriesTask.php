@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+namespace SetBase\Phing\Task;
+
+use Phing\Exception\BuildException;
+
 /**
  * Phing task for removing recursively empty directories.
  */
@@ -12,21 +16,21 @@ class RemoveEmptyDirectoriesTask extends SetBasedTask
    *
    * @var int
    */
-  private $count = 0;
+  private int $count = 0;
 
   /**
    * If set the parent directory must be removed too (if empty).
    *
    * @var bool
    */
-  private $removeParent = false;
+  private bool $removeParent = false;
 
   /**
    * The parent directory under which all empty directories must be removed.
    *
    * @var string
    */
-  private $workDirName;
+  private string $workDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -91,7 +95,7 @@ class RemoveEmptyDirectoriesTask extends SetBasedTask
    *
    * @return bool True if the parent directory is empty. Otherwise false.
    *
-   * @throws \BuildException
+   * @throws BuildException
    */
   private function removeEmptyDirs(string $parentDir): bool
   {

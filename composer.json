@@ -6,15 +6,15 @@
     "Extensions"
   ],
   "license": "MIT",
-  "require": {
-    "php": ">=7.3",
-    "phing/phing": "3.0.x-dev",
-    "setbased/helper-program-execution": "^1.0"
-  },
   "minimum-stability": "dev",
   "prefer-stable": true,
+  "require": {
+    "php": ">=7.4",
+    "phing/phing": "^3.0.0",
+    "setbased/helper-program-execution": "^1.0"
+  },
   "autoload": {
-    "classmap": ["src"]
+    "SetBased\\Phing\\Task\\": "src/"
   },
   "config": {
     "bin-dir": "bin/",

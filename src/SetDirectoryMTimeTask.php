@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+namespace SetBase\Phing\Task;
+
 /**
  * Phing task for setting recursively the mtime of a directories to the max mtime of its entries.
  */
@@ -8,18 +10,18 @@ class SetDirectoryMTimeTask extends SetBasedTask
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * The number of su-directories found.
+   * The number of sub-directories found.
    *
    * @var int
    */
-  private $count = 0;
+  private int $count = 0;
 
   /**
    * The parent directory under which the mtime of (source) files must be set.
    *
    * @var string
    */
-  private $workDirName;
+  private string $workDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**

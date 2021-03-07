@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+namespace SetBase\Phing\Task;
+
 /**
  * Phing task for reading a Semantic Version from the standard input.
  */
@@ -10,71 +12,64 @@ class ReadSemanticVersionTask extends SetBasedTask
   /**
    * The filename with contain semantic version number.
    *
-   * @var string
+   * @var string|null
    */
-  private $filename;
+  private ?string $filename = null;
 
   /**
    * Name of variable in a build for major part of version number.
    *
-   * @var string
+   * @var string|null
    */
-  private $majorProperty;
+  private ?string $majorProperty = null;
 
   /**
    * Name of variable in a build for minor part of version number.
    *
-   * @var string
+   * @var string|null
    */
-  private $minorProperty;
+  private ?string $minorProperty = null;
 
   /**
    * Array with parts of new version number.
    *
    * @var array
    */
-  private $newVersion = [];
+  private array $newVersion = [];
 
   /**
    * Name of variable in a build for patch part of version number.
    *
-   * @var string
+   * @var string|null
    */
-  private $patchVersion;
+  private ?string $patchVersion = null;
 
   /**
    * Name of variable in a build for pre-release part of version number (i.e. the part after - (if any)).
    *
-   * @var string
+   * @var string|null
    */
-  private $preReleaseVersion;
-
-  /**
-   * Array with parts of previous version number.
-   *
-   * @var array
-   */
-  private $previousVersion = [];
+  private ?string $preReleaseVersion = null;
 
   /**
    * Name of variable in a build for release part of version number (i.e. MAJOR.MINOR.PATCH).
    *
-   * @var string
+   * @var string|null
    */
-  private $releaseVersion;
+  private ?string $releaseVersion = null;
 
   /**
    * Name of variable in a build for full version number.
    *
-   * @var string
+   * @var string|null
    */
-  private $versionProperty;
+  private ?string $versionProperty = null;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Main method of this task.
    */
-  public function main()
+  public function main(): void
   {
     // Read current version form file.
     $this->readPreviousVersionNumber();
@@ -174,7 +169,7 @@ class ReadSemanticVersionTask extends SetBasedTask
    */
   private function readPreviousVersionNumber(): void
   {
-    if ($this->filename)
+    if ($this->filename!==null)
     {
       if (is_file($this->filename))
       {
@@ -186,14 +181,14 @@ class ReadSemanticVersionTask extends SetBasedTask
 
         if ($content)
         {
-          $this->previousVersion = $this->validateSemanticVersion($content);
-          if ($this->previousVersion)
+          $previousVersion = $this->validateSemanticVersion($content);
+          if ($previousVersion)
           {
-            $this->logInfo("Current version is %s", $this->previousVersion['version']);
+            $this->logInfo("Current version is %s", $previousVersion['version']);
           }
           else
           {
-            $this->logError("Version is %s is not a valid Semantic Version", $this->previousVersion['version']);
+            $this->logError("Version is %s is not a valid Semantic Version", $previousVersion['version']);
           }
         }
       }
@@ -232,29 +227,29 @@ class ReadSemanticVersionTask extends SetBasedTask
    */
   private function setProjectVersionProperties(): void
   {
-    if ($this->versionProperty)
+    if ($this->versionProperty!==null)
     {
       $this->project->setProperty($this->versionProperty, $this->newVersion['version']);
     }
 
-    if ($this->releaseVersion)
+    if ($this->releaseVersion!==null)
     {
       $this->project->setProperty($this->releaseVersion, $this->newVersion['release']);
     }
-    if ($this->preReleaseVersion)
+    if ($this->preReleaseVersion!==null)
     {
       $this->project->setProperty($this->preReleaseVersion, $this->newVersion['pre-release']);
     }
 
-    if ($this->majorProperty)
+    if ($this->majorProperty!==null)
     {
       $this->project->setProperty($this->majorProperty, $this->newVersion['major']);
     }
-    if ($this->minorProperty)
+    if ($this->minorProperty!==null)
     {
       $this->project->setProperty($this->minorProperty, $this->newVersion['minor']);
     }
-    if ($this->patchVersion)
+    if ($this->patchVersion!==null)
     {
       $this->project->setProperty($this->patchVersion, $this->newVersion['patch']);
     }

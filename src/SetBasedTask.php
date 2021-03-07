@@ -1,10 +1,16 @@
 <?php
 declare(strict_types=1);
 
+namespace SetBase\Phing\Task;
+
+use Phing\Exception\BuildException;
+use Phing\Project;
+use Phing\Task;
+
 /**
  * Parent Phing task with all general methods and properties.
  */
-abstract class SetBasedTask extends \Task
+abstract class SetBasedTask extends Task
 {
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -12,7 +18,7 @@ abstract class SetBasedTask extends \Task
    *
    * @var bool
    */
-  protected $haltOnError = true;
+  protected bool $haltOnError = true;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -33,7 +39,7 @@ abstract class SetBasedTask extends \Task
    * @param mixed ...$param The format and arguments similar as for
    *                        [sprintf](http://php.net/manual/function.sprintf.php)
    *
-   * @throws \BuildException
+   * @throws BuildException
    */
   protected function logError(): void
   {
@@ -45,8 +51,8 @@ abstract class SetBasedTask extends \Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    if ($this->haltOnError) throw new \BuildException(vsprintf($format, $args));
-    else $this->log(vsprintf($format, $args), \Project::MSG_ERR);
+    if ($this->haltOnError) throw new BuildException(vsprintf($format, $args));
+    else $this->log(vsprintf($format, $args), Project::MSG_ERR);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,7 +72,7 @@ abstract class SetBasedTask extends \Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log(vsprintf($format, $args), \Project::MSG_INFO);
+    $this->log(vsprintf($format, $args), Project::MSG_INFO);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,7 +93,7 @@ abstract class SetBasedTask extends \Task
       if (!is_scalar($arg)) $arg = var_export($arg, true);
     }
 
-    $this->log(vsprintf($format, $args), \Project::MSG_VERBOSE);
+    $this->log(vsprintf($format, $args), Project::MSG_VERBOSE);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

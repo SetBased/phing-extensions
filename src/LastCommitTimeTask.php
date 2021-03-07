@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+namespace SetBase\Phing\Task;
+
 use SetBased\Helper\ProgramExecution;
 
 /**
@@ -14,21 +16,21 @@ class LastCommitTimeTask extends SetBasedTask
    *
    * @var int
    */
-  private $count = 0;
+  private int $count = 0;
 
   /**
    * Array with last commit time for each file.
    *
    * @var array
    */
-  private $lastCommitTimes = [];
+  private array $lastCommitTimes = [];
 
   /**
    * The parent directory under which the mtime of (source) files must be set.
    *
    * @var string
    */
-  private $workDirName;
+  private string $workDirName;
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
