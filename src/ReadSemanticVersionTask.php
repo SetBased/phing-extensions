@@ -274,9 +274,9 @@ class ReadSemanticVersionTask extends SetBasedTask
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Validates a string is a valid Semantic Version. If the string is semantic version returns an array with the parts
-   * of the semantic version. Otherwise returns null.
+   * of the semantic version. Otherwise, returns null.
    *
-   * @param string $version The string the be validated.
+   * @param string $version The string to be validated.
    *
    * @return array
    */
