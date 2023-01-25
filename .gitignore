@@ -1,5 +1,5 @@
 /.idea
-/bin/phing
+/bin/
 /composer.lock
 /custom.task.properties
 /custom.type.properties
